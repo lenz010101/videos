@@ -1,0 +1,43 @@
+name: Render 1-minute Peru tips video
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'peru-tips/**'
+      - '.github/workflows/render-peru-tips.yml'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: peru-tips
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate composition
+        run: npm run verify
+
+      - name: Render MP4
+        run: npm run render
+
+      - name: Upload rendered video
+        uses: actions/upload-artifact@v4
+        with:
+          name: peru-tips-1min
+          path: peru-tips/renders/peru-tips-1min.mp4
+          if-no-files-found: error
+          retention-days: 7

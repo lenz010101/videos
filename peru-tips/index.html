@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>4 tips para vender winners en Perú — edición 1 minuto</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05070c; }
+    #stage {
+      width: 1280px; height: 720px; position: relative; overflow: hidden;
+      background: #05070c; color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    video { position: absolute; display: block; }
+
+    /* Fondo a pantalla completa: mismo material, desenfocado y atenuado.
+       Da el aspecto horizontal continuo del video de referencia. */
+    .bg {
+      left: 0; top: 0; width: 100%; height: 100%;
+      object-fit: cover;
+      filter: blur(28px) brightness(0.40) saturate(0.85);
+      transform: scale(1.18);
+    }
+    .tint {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 34%, rgba(0,0,0,0.58) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.34), rgba(0,0,0,0.10) 28%, rgba(0,0,0,0.10) 72%, rgba(0,0,0,0.46));
+    }
+    .vignette {
+      position: absolute; inset: 0;
+      box-shadow: inset 0 0 220px rgba(0,0,0,0.55);
+    }
+
+    /* Clip vertical centrado: conserva rótulos y subtítulos del material base. */
+    .fg {
+      left: 50%; top: 0; width: 405px; height: 720px;
+      margin-left: -202.5px;
+      object-fit: cover;
+      box-shadow: 0 26px 80px rgba(0,0,0,0.62);
+    }
+    .edge {
+      position: absolute; top: 0; left: 50%; width: 405px; height: 720px;
+      margin-left: -202.5px; pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+  </style>
+</head>
+<body>
+  <div id="stage" data-composition-id="peru-tips" data-start="0" data-duration="60" data-fps="30" data-width="1280" data-height="720">
+    <video class="clip bg" data-start="0" data-duration="60" data-track-index="0" src="./assets/clip-base.mp4" muted playsinline></video>
+    <div class="tint"></div>
+    <div class="vignette"></div>
+    <video class="clip fg" data-start="0" data-duration="60" data-track-index="1" src="./assets/clip-base.mp4" muted playsinline></video>
+    <div class="edge"></div>
+    <audio data-start="0" data-duration="60" data-track-index="2" data-volume="1" src="./assets/clip-base.mp4"></audio>
+  </div>
+</body>
+</html>

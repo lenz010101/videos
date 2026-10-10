@@ -1,0 +1,12 @@
+{
+  "name": "peru-tips-1min",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "hyperframes render -c ./index.html -o ./renders/peru-tips-1min.mp4",
+    "verify": "node ./verify.mjs"
+  },
+  "devDependencies": {
+    "hyperframes": "0.8.143"
+  }
+}
