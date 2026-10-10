@@ -10,7 +10,8 @@ const checks = {
   fiveSecondCssMotion: html.includes('animation: dogFly 5s') && html.includes('animation: planetFloat 5s'),
   galacticDogPresent: html.includes('Perro Galáctico') && html.includes('Perro astronauta galáctico'),
   npmPackageValid: packageJson.devDependencies?.hyperframes === '0.8.143',
-  renderCommandDuration: packageJson.scripts?.render?.includes('--duration 5'),
+  compositionDurationDeclared: html.includes('data-duration="5"'),
+  renderCommandValid: packageJson.scripts?.render?.includes('hyperframes render'),
   expectedOutput: packageJson.scripts?.render?.includes('perro-galactico.mp4'),
   durationDocumented: readme.includes('5 segundos'),
 };

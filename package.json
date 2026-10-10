@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "render": "hyperframes render -c ./index.html -o ./renders/perro-galactico.mp4 --duration 5",
+    "render": "hyperframes render -c ./index.html -o ./renders/perro-galactico.mp4",
     "verify": "node ./verify.mjs"
   },
   "devDependencies": {
