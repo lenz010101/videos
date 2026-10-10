@@ -1,0 +1,12 @@
+{
+  "name": "perro-galactico-hyperframes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "hyperframes render -c ./index.html -o ./renders/perro-galactico.mp4 --duration 5",
+    "verify": "node ./verify.mjs"
+  },
+  "devDependencies": {
+    "hyperframes": "0.8.143"
+  }
+}
