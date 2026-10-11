@@ -36,7 +36,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install faster-whisper
-        run: pip install faster-whisper
+        run: pip install --upgrade faster-whisper "av>=12"
 
       - name: Transcribe
         run: >
