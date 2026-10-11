@@ -1,0 +1,52 @@
+name: Transcribe audio to captions (cloud)
+
+on:
+  workflow_dispatch:
+    inputs:
+      audio:
+        description: "Audio file or dir in repo (default: audio/)"
+        required: false
+        default: "audio/"
+      model:
+        description: "Whisper model"
+        required: false
+        default: "small"
+      language:
+        description: "Spoken language code"
+        required: false
+        default: "es"
+  push:
+    paths:
+      - "audio/**"
+      - transcribe.py
+      - .github/workflows/transcribe.yml
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install faster-whisper
+        run: pip install faster-whisper
+
+      - name: Transcribe
+        run: >
+          python transcribe.py --input "${{ inputs.audio || 'audio/' }}"
+          --model "${{ inputs.model || 'small' }}"
+          --language "${{ inputs.language || 'es' }}"
+          --output-dir captions
+
+      - name: Upload captions
+        uses: actions/upload-artifact@v4
+        with:
+          name: captions-srt
+          path: captions/*.srt
+          if-no-files-found: error
+          retention-days: 30
