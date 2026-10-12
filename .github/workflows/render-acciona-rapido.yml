@@ -1,0 +1,43 @@
+name: Render Acciona Rapido (cloud)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'acciona-rapido/**'
+      - '.github/workflows/render-acciona-rapido.yml'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: acciona-rapido
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint composition
+        run: npx --yes hyperframes@0.8.145 lint
+
+      - name: Render MP4
+        run: npx --yes hyperframes@0.8.145 render --fps 30 --quality high -o renders/acciona-rapido.mp4
+
+      - name: Upload rendered video
+        uses: actions/upload-artifact@v4
+        with:
+          name: acciona-rapido-60s
+          path: acciona-rapido/renders/acciona-rapido.mp4
+          if-no-files-found: error
+          retention-days: 14

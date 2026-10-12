@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=720, height=1280" />
+  <title>Acciona rápido en e-commerce — HyperFrames</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/Montserrat-VF.ttf") format("truetype");
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    #root {
+      position: relative; width: 720px; height: 1280px; overflow: hidden;
+      background: #000; color: #fff;
+      font-family: "Montserrat", system-ui, sans-serif;
+    }
+    .clip { position: absolute; }
+    video.fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    /* ---------- hook card ---------- */
+    #hook { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; text-align: center; padding: 0 64px; }
+    #hook .kicker { font-size: 30px; font-weight: 800; letter-spacing: 6px; color: #FFC300; margin: 0 0 28px; }
+    #hook h1 { font-size: 72px; font-weight: 900; line-height: 1.12; margin: 0; }
+    #hook h1 em { font-style: normal; color: #FFC300; }
+    #hook .sub { font-size: 28px; font-weight: 600; color: rgba(255,255,255,.65); margin: 30px 0 0; }
+
+    /* ---------- title bar ---------- */
+    #titlebar { left: 36px; right: 36px; top: 52px; }
+    #titlebar .eyebrow { font-size: 24px; font-weight: 800; letter-spacing: 4px; color: #FFC300; margin: 0 0 10px; text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+    #titlebar h2 { font-size: 62px; font-weight: 900; line-height: 1.05; margin: 0; text-shadow: 0 3px 18px rgba(0,0,0,.85); }
+    #titlebar h2 em { font-style: normal; color: #FFC300; }
+
+    /* ---------- tip list ---------- */
+    .tip { right: 36px; top: 268px; width: 252px; }
+    .tip + .tip { margin-top: 0; }
+    #tip2 { top: 404px; }
+    #tip3 { top: 540px; }
+    .tip .pill {
+      background: rgba(0,0,0,.62); border: 2px solid rgba(255,195,0,.85);
+      border-radius: 18px; padding: 16px 18px;
+      font-size: 27px; font-weight: 800; line-height: 1.2;
+    }
+    .tip .pill b { color: #FFC300; font-weight: 900; }
+
+    /* ---------- gancho badge ---------- */
+    #gancho { left: 60px; right: 60px; top: 470px; text-align: center; }
+    #gancho .badge {
+      display: inline-block; background: rgba(0,0,0,.7);
+      border: 3px solid #FFC300; border-radius: 22px; padding: 22px 30px;
+      font-size: 36px; font-weight: 900; line-height: 1.25;
+      box-shadow: 0 8px 40px rgba(0,0,0,.6);
+    }
+    #gancho .badge em { font-style: normal; color: #FFC300; }
+
+    /* ---------- karaoke captions ---------- */
+    .cap { left: 0; right: 0; bottom: 150px; text-align: center; padding: 0 44px; }
+    .cap .w {
+      display: inline-block; margin: 0 8px;
+      font-size: 54px; font-weight: 800; line-height: 1.3; color: #fff;
+      text-shadow: 0 2px 0 #000, 0 -2px 0 #000, 2px 0 0 #000, -2px 0 0 #000,
+                   0 4px 16px rgba(0,0,0,.9);
+      opacity: .38;
+      animation-name: word-on;
+      animation-duration: .28s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: both;
+    }
+    @keyframes word-on {
+      from { opacity: .38; transform: scale(.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="main" data-start="0"
+       data-width="720" data-height="1280" data-duration="60.5">
+
+    <!-- base: talking head con audio original -->
+    <video id="main-video" class="clip fill" data-start="1.6" data-duration="58.9"
+           data-track-index="0" data-has-audio="true" playsinline preload="auto"
+           src="assets/segmento-graded.mp4" style="object-position:50% 28%"></video>
+
+    <!-- b-roll cutaways (mudos: el audio sigue en el video base) -->
+    <video id="broll1" class="clip fill" data-start="30.6" data-duration="2.4"
+           data-track-index="1" data-media-start="3" muted playsinline preload="auto"
+           src="assets/broll-fono.mp4"></video>
+    <video id="broll2" class="clip fill" data-start="34.4" data-duration="2.6"
+           data-track-index="1" data-media-start="5" muted playsinline preload="auto"
+           src="assets/broll-tarjeta.mp4"></video>
+    <video id="broll3" class="clip fill" data-start="37.9" data-duration="2.6"
+           data-track-index="1" data-media-start="3" muted playsinline preload="auto"
+           src="assets/broll-paquete.mp4"></video>
+
+    <!-- barra de título persistente -->
+    <div id="titlebar" class="clip" data-start="1.6" data-duration="58.9" data-track-index="2">
+      <p class="eyebrow">CONSEJO #3 · E-COMMERCE</p>
+      <h2>ACCIONA <em>RÁPIDO</em></h2>
+    </div>
+
+    <!-- lista acumulativa -->
+    <div id="tip1" class="clip tip" data-start="30.66" data-duration="29.84" data-track-index="3">
+      <div class="pill"><b>1.</b> Productos al toque</div>
+    </div>
+    <div id="tip2" class="clip tip" data-start="34.44" data-duration="26.06" data-track-index="3">
+      <div class="pill"><b>2.</b> Landing al toque</div>
+    </div>
+    <div id="tip3" class="clip tip" data-start="37.88" data-duration="22.62" data-track-index="3">
+      <div class="pill"><b>3.</b> Lanza tu testeo</div>
+    </div>
+
+    <!-- tarjeta gancho + badge -->
+    <div id="hook" class="clip" data-start="0" data-duration="1.6" data-track-index="4">
+      <p class="kicker">CONSEJO #3</p>
+      <h1>EL E-COMMERCE PREMIA AL <em>MÁS VELOZ</em></h1>
+      <p class="sub">quedate hasta el final</p>
+    </div>
+    <div id="gancho" class="clip" data-start="23.3" data-duration="3.9" data-track-index="4">
+      <div class="badge">ESTE NEGOCIO PREMIA<br />AL <em>MÁS VELOZ</em></div>
+    </div>
+
+    <div id="cap-1" class="clip cap" data-start="1.780" data-duration="1.860" data-track-index="5"><span class="w" style="animation-delay:0.000s">acciona</span> <span class="w" style="animation-delay:0.820s">rápido</span> <span class="w" style="animation-delay:1.560s">y</span></div>
+<div id="cap-2" class="clip cap" data-start="3.640" data-duration="0.600" data-track-index="5"><span class="w" style="animation-delay:0.000s">no</span> <span class="w" style="animation-delay:0.120s">dejes</span> <span class="w" style="animation-delay:0.420s">que</span></div>
+<div id="cap-3" class="clip cap" data-start="4.240" data-duration="1.020" data-track-index="5"><span class="w" style="animation-delay:0.000s">los</span> <span class="w" style="animation-delay:0.160s">días</span> <span class="w" style="animation-delay:0.380s">pasen</span></div>
+<div id="cap-4" class="clip cap" data-start="5.260" data-duration="2.140" data-track-index="5"><span class="w" style="animation-delay:0.000s">no</span> <span class="w" style="animation-delay:0.660s">procrastines</span> <span class="w" style="animation-delay:1.500s">y</span></div>
+<div id="cap-5" class="clip cap" data-start="7.400" data-duration="0.840" data-track-index="5"><span class="w" style="animation-delay:0.000s">esto</span> <span class="w" style="animation-delay:0.160s">hace</span> <span class="w" style="animation-delay:0.380s">mucha</span></div>
+<div id="cap-6" class="clip cap" data-start="8.240" data-duration="1.020" data-track-index="5"><span class="w" style="animation-delay:0.000s">gente</span> <span class="w" style="animation-delay:0.320s">inclusive</span> <span class="w" style="animation-delay:0.640s">gente</span></div>
+<div id="cap-7" class="clip cap" data-start="9.260" data-duration="1.020" data-track-index="5"><span class="w" style="animation-delay:0.000s">que</span> <span class="w" style="animation-delay:0.220s">paga</span> <span class="w" style="animation-delay:0.420s">mentorías</span></div>
+<div id="cap-8" class="clip cap" data-start="10.280" data-duration="1.160" data-track-index="5"><span class="w" style="animation-delay:0.000s">y</span> <span class="w" style="animation-delay:0.640s">dice</span> <span class="w" style="animation-delay:0.820s">ok</span></div>
+<div id="cap-9" class="clip cap" data-start="11.440" data-duration="0.940" data-track-index="5"><span class="w" style="animation-delay:0.000s">tengo</span> <span class="w" style="animation-delay:0.340s">tres</span> <span class="w" style="animation-delay:0.560s">meses</span></div>
+<div id="cap-10" class="clip cap" data-start="12.380" data-duration="1.920" data-track-index="5"><span class="w" style="animation-delay:0.000s">y</span> <span class="w" style="animation-delay:1.240s">la</span> <span class="w" style="animation-delay:1.680s">primera</span></div>
+<div id="cap-11" class="clip cap" data-start="14.300" data-duration="0.840" data-track-index="5"><span class="w" style="animation-delay:0.000s">semana</span> <span class="w" style="animation-delay:0.300s">como</span> <span class="w" style="animation-delay:0.640s">que</span></div>
+<div id="cap-12" class="clip cap" data-start="15.140" data-duration="1.280" data-track-index="5"><span class="w" style="animation-delay:0.000s">huevea</span> <span class="w" style="animation-delay:0.720s">te</span> <span class="w" style="animation-delay:1.220s">hace</span></div>
+<div id="cap-13" class="clip cap" data-start="16.420" data-duration="0.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">el</span> <span class="w" style="animation-delay:0.140s">tiempo</span> <span class="w" style="animation-delay:0.260s">pasar</span></div>
+<div id="cap-14" class="clip cap" data-start="17.080" data-duration="2.380" data-track-index="5"><span class="w" style="animation-delay:0.000s">un</span> <span class="w" style="animation-delay:1.700s">inicio</span> <span class="w" style="animation-delay:2.200s">hay</span></div>
+<div id="cap-15" class="clip cap" data-start="19.460" data-duration="0.740" data-track-index="5"><span class="w" style="animation-delay:0.000s">que</span> <span class="w" style="animation-delay:0.080s">hacer</span> <span class="w" style="animation-delay:0.300s">todo</span></div>
+<div id="cap-16" class="clip cap" data-start="20.200" data-duration="2.040" data-track-index="5"><span class="w" style="animation-delay:0.000s">rápido</span> <span class="w" style="animation-delay:0.560s">creeme</span> <span class="w" style="animation-delay:1.860s">este</span></div>
+<div id="cap-17" class="clip cap" data-start="22.240" data-duration="0.880" data-track-index="5"><span class="w" style="animation-delay:0.000s">negocio</span> <span class="w" style="animation-delay:0.400s">premio</span> <span class="w" style="animation-delay:0.780s">al</span></div>
+<div id="cap-18" class="clip cap" data-start="23.120" data-duration="1.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">más</span> <span class="w" style="animation-delay:0.180s">veloz</span> <span class="w" style="animation-delay:1.200s">porque</span></div>
+<div id="cap-19" class="clip cap" data-start="24.780" data-duration="0.520" data-track-index="5"><span class="w" style="animation-delay:0.000s">no</span> <span class="w" style="animation-delay:0.160s">eres</span> <span class="w" style="animation-delay:0.340s">el</span></div>
+<div id="cap-20" class="clip cap" data-start="25.300" data-duration="0.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">único</span> <span class="w" style="animation-delay:0.200s">que</span> <span class="w" style="animation-delay:0.520s">lo</span></div>
+<div id="cap-21" class="clip cap" data-start="25.960" data-duration="0.700" data-track-index="5"><span class="w" style="animation-delay:0.000s">está</span> <span class="w" style="animation-delay:0.160s">haciendo</span> <span class="w" style="animation-delay:0.500s">no</span></div>
+<div id="cap-22" class="clip cap" data-start="26.660" data-duration="0.520" data-track-index="5"><span class="w" style="animation-delay:0.000s">eres</span> <span class="w" style="animation-delay:0.140s">el</span> <span class="w" style="animation-delay:0.320s">único</span></div>
+<div id="cap-23" class="clip cap" data-start="27.180" data-duration="0.600" data-track-index="5"><span class="w" style="animation-delay:0.000s">que</span> <span class="w" style="animation-delay:0.220s">acaba</span> <span class="w" style="animation-delay:0.440s">de</span></div>
+<div id="cap-24" class="clip cap" data-start="27.780" data-duration="0.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">ver</span> <span class="w" style="animation-delay:0.100s">un</span> <span class="w" style="animation-delay:0.220s">producto</span></div>
+<div id="cap-25" class="clip cap" data-start="28.440" data-duration="3.180" data-track-index="5"><span class="w" style="animation-delay:0.000s">no</span> <span class="w" style="animation-delay:1.400s">procrastines</span> <span class="w" style="animation-delay:2.220s">busca</span></div>
+<div id="cap-26" class="clip cap" data-start="31.620" data-duration="0.740" data-track-index="5"><span class="w" style="animation-delay:0.000s">los</span> <span class="w" style="animation-delay:0.160s">productos</span> <span class="w" style="animation-delay:0.500s">al</span></div>
+<div id="cap-27" class="clip cap" data-start="32.360" data-duration="2.080" data-track-index="5"><span class="w" style="animation-delay:0.000s">toque</span> <span class="w" style="animation-delay:0.380s">es</span> <span class="w" style="animation-delay:0.680s">a</span></div>
+<div id="cap-28" class="clip cap" data-start="34.440" data-duration="0.600" data-track-index="5"><span class="w" style="animation-delay:0.000s">la</span> <span class="w" style="animation-delay:0.120s">lándiga</span> <span class="w" style="animation-delay:0.440s">al</span></div>
+<div id="cap-29" class="clip cap" data-start="35.040" data-duration="1.560" data-track-index="5"><span class="w" style="animation-delay:0.000s">toque</span> <span class="w" style="animation-delay:0.340s">valía</span> <span class="w" style="animation-delay:0.940s">los</span></div>
+<div id="cap-30" class="clip cap" data-start="36.600" data-duration="1.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">vídeos</span> <span class="w" style="animation-delay:0.920s">y</span> <span class="w" style="animation-delay:1.280s">lanza</span></div>
+<div id="cap-31" class="clip cap" data-start="38.260" data-duration="0.780" data-track-index="5"><span class="w" style="animation-delay:0.000s">tu</span> <span class="w" style="animation-delay:0.160s">primer</span> <span class="w" style="animation-delay:0.320s">testeo</span></div>
+<div id="cap-32" class="clip cap" data-start="39.040" data-duration="0.660" data-track-index="5"><span class="w" style="animation-delay:0.000s">lo</span> <span class="w" style="animation-delay:0.080s">más</span> <span class="w" style="animation-delay:0.340s">rápido</span></div>
+<div id="cap-33" class="clip cap" data-start="39.700" data-duration="1.840" data-track-index="5"><span class="w" style="animation-delay:0.000s">posible</span> <span class="w" style="animation-delay:0.440s">no</span> <span class="w" style="animation-delay:1.100s">procrastines</span></div>
+<div id="cap-34" class="clip cap" data-start="41.540" data-duration="0.740" data-track-index="5"><span class="w" style="animation-delay:0.000s">no</span> <span class="w" style="animation-delay:0.300s">dejes</span> <span class="w" style="animation-delay:0.560s">que</span></div>
+<div id="cap-35" class="clip cap" data-start="42.280" data-duration="1.120" data-track-index="5"><span class="w" style="animation-delay:0.000s">los</span> <span class="w" style="animation-delay:0.180s">días</span> <span class="w" style="animation-delay:0.360s">pase</span></div>
+<div id="cap-36" class="clip cap" data-start="43.400" data-duration="2.580" data-track-index="5"><span class="w" style="animation-delay:0.000s">ok</span> <span class="w" style="animation-delay:1.680s">no</span> <span class="w" style="animation-delay:2.420s">lo</span></div>
+<div id="cap-37" class="clip cap" data-start="45.980" data-duration="1.220" data-track-index="5"><span class="w" style="animation-delay:0.000s">hagas</span> <span class="w" style="animation-delay:0.360s">es</span> <span class="w" style="animation-delay:0.900s">muy</span></div>
+<div id="cap-38" class="clip cap" data-start="47.200" data-duration="0.960" data-track-index="5"><span class="w" style="animation-delay:0.000s">importante</span> <span class="w" style="animation-delay:0.460s">que</span> <span class="w" style="animation-delay:0.700s">tengas</span></div>
+<div id="cap-39" class="clip cap" data-start="48.160" data-duration="0.940" data-track-index="5"><span class="w" style="animation-delay:0.000s">este</span> <span class="w" style="animation-delay:0.200s">concept</span> <span class="w" style="animation-delay:0.580s">que</span></div>
+<div id="cap-40" class="clip cap" data-start="49.100" data-duration="0.540" data-track-index="5"><span class="w" style="animation-delay:0.000s">todo</span> <span class="w" style="animation-delay:0.280s">es</span> <span class="w" style="animation-delay:0.400s">muy</span></div>
+<div id="cap-41" class="clip cap" data-start="49.640" data-duration="0.480" data-track-index="5"><span class="w" style="animation-delay:0.000s">en</span> <span class="w" style="animation-delay:0.140s">cuenta</span> <span class="w" style="animation-delay:0.240s">este</span></div>
+<div id="cap-42" class="clip cap" data-start="50.120" data-duration="0.960" data-track-index="5"><span class="w" style="animation-delay:0.000s">concept</span> <span class="w" style="animation-delay:0.300s">porque</span> <span class="w" style="animation-delay:0.700s">los</span></div>
+<div id="cap-43" class="clip cap" data-start="51.080" data-duration="2.720" data-track-index="5"><span class="w" style="animation-delay:0.000s">días</span> <span class="w" style="animation-delay:0.320s">cuentan</span> <span class="w" style="animation-delay:1.660s">vale</span></div>
+<div id="cap-44" class="clip cap" data-start="53.800" data-duration="1.400" data-track-index="5"><span class="w" style="animation-delay:0.000s">mientras</span> <span class="w" style="animation-delay:0.760s">más</span> <span class="w" style="animation-delay:1.040s">rápido</span></div>
+<div id="cap-45" class="clip cap" data-start="55.200" data-duration="1.240" data-track-index="5"><span class="w" style="animation-delay:0.000s">lo</span> <span class="w" style="animation-delay:0.220s">hagas</span> <span class="w" style="animation-delay:0.560s">más</span></div>
+<div id="cap-46" class="clip cap" data-start="56.440" data-duration="0.780" data-track-index="5"><span class="w" style="animation-delay:0.000s">rápido</span> <span class="w" style="animation-delay:0.320s">puede</span> <span class="w" style="animation-delay:0.560s">llegar</span></div>
+<div id="cap-47" class="clip cap" data-start="57.220" data-duration="0.620" data-track-index="5"><span class="w" style="animation-delay:0.000s">a</span> <span class="w" style="animation-delay:0.100s">tener</span> <span class="w" style="animation-delay:0.320s">esa</span></div>
+<div id="cap-48" class="clip cap" data-start="57.840" data-duration="0.520" data-track-index="5"><span class="w" style="animation-delay:0.000s">meta</span> <span class="w" style="animation-delay:0.180s">que</span> <span class="w" style="animation-delay:0.320s">tanto</span></div>
+<div id="cap-49" class="clip cap" data-start="58.360" data-duration="2.140" data-track-index="5"><span class="w" style="animation-delay:0.000s">quieres</span> <span class="w" style="animation-delay:1.680s">listo</span></div>
+
+    <!-- música con ducking horneado -->
+    <audio id="bgm" class="clip" data-start="0" data-duration="58.93"
+           data-track-index="6" src="assets/bgm-ducked.mp3"></audio>
+
+    <!-- sfx -->
+    <audio id="sfx-impact" class="clip" data-start="1.6" data-duration="2.12"
+           data-track-index="7" src="assets/sfx/impact-bass-1.mp3"></audio>
+    <audio id="sfx-riser" class="clip" data-start="13.27" data-duration="10.03"
+           data-track-index="7" src="assets/sfx/riser.mp3"></audio>
+    <audio id="sfx-notif" class="clip" data-start="23.3" data-duration="2.46"
+           data-track-index="7" src="assets/sfx/notification.mp3"></audio>
+    <audio id="sfx-w1" class="clip" data-start="30.6" data-duration="0.57"
+           data-track-index="7" src="assets/sfx/whoosh-short.mp3"></audio>
+    <audio id="sfx-p1" class="clip" data-start="30.66" data-duration="0.72"
+           data-track-index="7" src="assets/sfx/pop.mp3"></audio>
+    <audio id="sfx-w2" class="clip" data-start="34.4" data-duration="0.57"
+           data-track-index="7" src="assets/sfx/whoosh-short.mp3"></audio>
+    <audio id="sfx-p2" class="clip" data-start="34.44" data-duration="0.72"
+           data-track-index="7" src="assets/sfx/pop.mp3"></audio>
+    <audio id="sfx-w3" class="clip" data-start="37.9" data-duration="0.57"
+           data-track-index="7" src="assets/sfx/whoosh-short.mp3"></audio>
+    <audio id="sfx-p3" class="clip" data-start="37.88" data-duration="0.72"
+           data-track-index="7" src="assets/sfx/pop.mp3"></audio>
+  </div>
+
+  <script>
+    document.fonts.ready.then(function () {
+      var tl = gsap.timeline({ paused: true });
+      // hook: pop del titular
+      tl.from("#hook h1", { scale: 0.86, opacity: 0, duration: 0.45, ease: "back.out(1.6)" }, 0.05);
+      tl.from("#hook .kicker", { y: -18, opacity: 0, duration: 0.35, ease: "power2.out" }, 0.05);
+      // respiración lenta del plano base (ken burns sutil)
+      tl.fromTo("#main-video", { scale: 1 }, { scale: 1.06, duration: 58.9, ease: "none" }, 1.6);
+      // título
+      tl.from("#titlebar", { y: -34, opacity: 0, duration: 0.5, ease: "power3.out" }, 1.6);
+      // badge gancho
+      tl.from("#gancho .badge", { scale: 0.82, opacity: 0, duration: 0.4, ease: "back.out(1.8)" }, 23.3);
+      // tips acumulativos
+      tl.from("#tip1 .pill", { x: 40, opacity: 0, duration: 0.35, ease: "power3.out" }, 30.66);
+      tl.from("#tip2 .pill", { x: 40, opacity: 0, duration: 0.35, ease: "power3.out" }, 34.44);
+      tl.from("#tip3 .pill", { x: 40, opacity: 0, duration: 0.35, ease: "power3.out" }, 37.88);
+      // push-in en cada b-roll
+      tl.fromTo("#broll1", { scale: 1.12 }, { scale: 1.0, duration: 2.4, ease: "none" }, 30.6);
+      tl.fromTo("#broll2", { scale: 1.12 }, { scale: 1.0, duration: 2.6, ease: "none" }, 34.4);
+      tl.fromTo("#broll3", { scale: 1.12 }, { scale: 1.0, duration: 2.6, ease: "none" }, 37.9);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    });
+  </script>
+</body>
+</html>
