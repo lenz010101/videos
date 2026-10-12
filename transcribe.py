@@ -63,6 +63,7 @@ def main() -> int:
         segments, info = model.transcribe(
             str(audio), language=args.language, word_timestamps=True
         )
+        segments = list(segments)  # materialize: the generator can only be consumed once
         dest = outdir / (audio.stem + ".srt")
         to_srt(segments, dest)
         wdest = outdir / (audio.stem + ".words.json")
