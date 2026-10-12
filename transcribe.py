@@ -5,6 +5,7 @@ Usage:
     python transcribe.py --input audio/ --model base --language es --output-dir captions
 """
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -21,6 +22,20 @@ def to_srt(segments, path: Path) -> None:
     with path.open("w", encoding="utf-8") as f:
         for i, seg in enumerate(segments, 1):
             f.write(f"{i}\n{ts(seg.start)} --> {ts(seg.end)}\n{seg.text.strip()}\n\n")
+
+
+def to_words_json(segments, path: Path) -> None:
+    """Word-level timestamps for karaoke captions."""
+    words = []
+    for seg in segments:
+        for w in getattr(seg, "words", None) or []:
+            words.append({
+                "word": w.word.strip(),
+                "start": round(w.start, 3),
+                "end": round(w.end, 3),
+            })
+    payload = {"language": "es", "word_count": len(words), "words": words}
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def main() -> int:
@@ -45,10 +60,14 @@ def main() -> int:
     outdir.mkdir(parents=True, exist_ok=True)
     model = WhisperModel(args.model, device="cpu", compute_type="int8")
     for audio in files:
-        segments, info = model.transcribe(str(audio), language=args.language)
+        segments, info = model.transcribe(
+            str(audio), language=args.language, word_timestamps=True
+        )
         dest = outdir / (audio.stem + ".srt")
         to_srt(segments, dest)
-        print(f"OK {audio} (lang={info.language} p={info.language_probability:.2f}) -> {dest}")
+        wdest = outdir / (audio.stem + ".words.json")
+        to_words_json(segments, wdest)
+        print(f"OK {audio} (lang={info.language} p={info.language_probability:.2f}) -> {dest} + {wdest}")
     return 0
 
 
