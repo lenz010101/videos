@@ -3,6 +3,10 @@ name: Render NEXUS ONE 30s (cloud max)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   render-slice:
     runs-on: ubuntu-latest
@@ -33,7 +37,18 @@ jobs:
         run: npx puppeteer browsers install chrome --with-deps
 
       - name: Render slice
-        run: SLICES=4 SLICE=${{ matrix.slice }} node render.cjs
+        run: SLICES=4 SLICE=${{ matrix.slice }} node render.cjs > render-${{ matrix.slice }}.log 2>&1; echo "exit=$?"; tail -20 render-${{ matrix.slice }}.log; exit $(grep -q "OK (" render-${{ matrix.slice }}.log && echo 0 || echo 1)
+
+      - name: Report failure to issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=$(tail -c 12000 "render-${{ matrix.slice }}.log")
+          gh api repos/lenz010101/videos/issues/1/comments -f body="SLICE ${{ matrix.slice }} FAILED:
+```
+$BODY
+```"
 
       - name: Upload slice frames
         uses: actions/upload-artifact@v4
