@@ -37,18 +37,24 @@ jobs:
         run: npx puppeteer browsers install chrome --with-deps
 
       - name: Render slice
-        run: SLICES=4 SLICE=${{ matrix.slice }} node render.cjs > render-${{ matrix.slice }}.log 2>&1; echo "exit=$?"; tail -20 render-${{ matrix.slice }}.log; exit $(grep -q "OK (" render-${{ matrix.slice }}.log && echo 0 || echo 1)
+        run: |
+          SLICES=4 SLICE=${{ matrix.slice }} node render.cjs > slice-${{ matrix.slice }}.log 2>&1
+          CODE=$?
+          tail -20 slice-${{ matrix.slice }}.log
+          if grep -q "OK (" slice-${{ matrix.slice }}.log; then
+            exit 0
+          else
+            exit $CODE
+          fi
 
       - name: Report failure to issue
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BODY=$(tail -c 12000 "render-${{ matrix.slice }}.log")
-          gh api repos/lenz010101/videos/issues/1/comments -f body="SLICE ${{ matrix.slice }} FAILED:
-```
-$BODY
-```"
+          MSG=$(tail -c 12000 slice-${{ matrix.slice }}.log)
+          printf "SLICE ${{ matrix.slice }} FAILED:\n%s\n" "$MSG" > msg.txt
+          gh api repos/lenz010101/videos/issues/1/comments -F body=@msg.txt
 
       - name: Upload slice frames
         uses: actions/upload-artifact@v4
