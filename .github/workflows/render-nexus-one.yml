@@ -1,0 +1,40 @@
+name: Render NEXUS ONE 30s (cloud max)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    defaults:
+      run:
+        working-directory: nexus-one
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install renderer deps
+        run: npm init -y && npm install puppeteer
+
+      - name: Install Chrome with deps
+        run: npx puppeteer browsers install chrome --with-deps
+
+      - name: Render frames + MP4
+        run: node render.cjs
+
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-one-30s
+          path: nexus-one/renders/nexus-one-30s.mp4
+          if-no-files-found: error
+          retention-days: 14
