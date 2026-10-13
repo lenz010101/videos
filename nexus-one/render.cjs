@@ -20,24 +20,26 @@ const path = require('path');
   console.log('Launching chrome...');
   const browser = await puppeteer.launch({
     headless: 'new',
+    protocolTimeout: 600000,
     args: ['--window-size=1920,1080', '--no-sandbox', '--disable-dev-shm-usage', '--force-device-scale-factor=1']
   });
   console.log('Chrome launched: ' + await browser.version());
   const page = await browser.newPage();
   await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
-  page.on('console', (m) => console.log('[page:' + m.type() + '] ' + m.text()));
   page.on('pageerror', (e) => console.log('[pageerror] ' + e.message));
-  page.on('requestfailed', (r) => console.log('[reqfail] ' + r.url() + ' :: ' + (r.failure() && r.failure().errorText)));
+  page.on('requestfailed', (r) => console.log('[reqfail] ' + r.url()));
   console.log('Goto index.html...');
   await page.goto('file://' + path.join(dir, 'index.html'), { waitUntil: 'load', timeout: 60000 });
   console.log('Loaded. Waiting for master...');
   await page.waitForFunction("typeof gsap !== 'undefined'", { timeout: 60000 });
-  console.log('gsap OK. Waiting for master...');
   await page.waitForFunction("typeof master !== 'undefined' && master.totalDuration() >= 30", { timeout: 90000 });
-  console.log('master OK, totalDuration=' + (await page.evaluate(() => master.totalDuration())));
   await page.evaluate(async () => { try { await document.fonts.ready; } catch (e) {} });
   await page.evaluate(() => master.pause());
-  await new Promise((r) => setTimeout(r, 1500));
+  console.log('Warmup screenshots (first raster)...');
+  await page.evaluate((t) => master.seek(t), (start / totalFrames) * duration);
+  await page.screenshot({ path: framesDir + '/warmup.jpg', type: 'jpeg', quality: 70 });
+  console.log('Warmup OK, starting loop');
+  await new Promise((r) => setTimeout(r, 1000));
 
   for (let i = start; i <= end; i++) {
     const time = (i / totalFrames) * duration;
@@ -46,6 +48,7 @@ const path = require('path');
     await page.screenshot({ path: framesDir + '/frame_' + frameNum + '.jpg', type: 'jpeg', quality: 92 });
     if ((i - start) % 120 === 0) console.log('Slice ' + slice + ' progreso: ' + (i / fps).toFixed(1) + 's / ' + duration + 's');
   }
+  try { fs.unlinkSync(framesDir + '/warmup.jpg'); } catch (e) {}
   await browser.close();
   console.log('Slice ' + slice + ' OK (' + (end - start + 1) + ' frames)');
 })().catch((e) => { console.error('FATAL ' + (e && e.stack || e)); process.exit(1); });
