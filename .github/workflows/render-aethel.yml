@@ -1,0 +1,81 @@
+name: Render AETHEL 30s (cloud max)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  render-slice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        slice: [0, 1, 2, 3]
+    defaults:
+      run:
+        working-directory: aethel-30s
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Install renderer deps
+        run: npm init -y && npm install puppeteer
+      - name: Install Chrome with deps
+        run: npx puppeteer browsers install chrome --with-deps
+      - name: Render slice
+        run: |
+          SLICES=4 SLICE=${{ matrix.slice }} node render.cjs > slice-${{ matrix.slice }}.log 2>&1
+          CODE=$?
+          tail -5 slice-${{ matrix.slice }}.log
+          if grep -q "OK (" slice-${{ matrix.slice }}.log; then
+            exit 0
+          else
+            exit $CODE
+          fi
+      - name: Report failure to issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MSG=$(tail -c 12000 slice-${{ matrix.slice }}.log)
+          printf "AETHEL SLICE ${{ matrix.slice }} FAILED:\n%s\n" "$MSG" > msg.txt
+          gh api repos/lenz010101/videos/issues/1/comments -F body=@msg.txt
+      - name: Upload slice frames
+        uses: actions/upload-artifact@v4
+        with:
+          name: frames-aethel-${{ matrix.slice }}
+          path: aethel-30s/frames-slice-${{ matrix.slice }}/
+          if-no-files-found: error
+          retention-days: 1
+
+  combine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: render-slice
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Download all slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: frames-aethel-*
+          path: frames
+          merge-multiple: true
+      - name: Build MP4
+        run: ffmpeg -y -framerate 60 -i "frames/frame_%05d.jpg" -c:v libx264 -pix_fmt yuv420p -crf 17 aethel-30s.mp4
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: aethel-30s
+          path: aethel-30s.mp4
+          if-no-files-found: error
+          retention-days: 14
