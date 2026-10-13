@@ -71,7 +71,7 @@ jobs:
           path: frames
           merge-multiple: true
       - name: Build MP4
-        run: ffmpeg -y -framerate 60 -i "frames/frame_%05d.jpg" -c:v libx264 -pix_fmt yuv420p -crf 17 aethel-30s.mp4
+        run: ffmpeg -y -framerate 30 -i "frames/frame_%05d.jpg" -c:v libx264 -pix_fmt yuv420p -crf 17 aethel-30s.mp4
       - name: Upload MP4
         uses: actions/upload-artifact@v4
         with:
