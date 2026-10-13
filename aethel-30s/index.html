@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0" />
+  <title>Hyperframes - AETHEL 30s Motion Blur Engine</title>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: 'Syne'; src: url('assets/fonts/Syne-700.woff2') format('woff2'); font-weight: 700; }
+    @font-face { font-family: 'Syne'; src: url('assets/fonts/Syne-800.woff2') format('woff2'); font-weight: 800; }
+    @font-face { font-family: 'Plus Jakarta Sans'; src: url('assets/fonts/PlusJakartaSans-400.woff2') format('woff2'); font-weight: 400; }
+    @font-face { font-family: 'Plus Jakarta Sans'; src: url('assets/fonts/PlusJakartaSans-500.woff2') format('woff2'); font-weight: 500; }
+    @font-face { font-family: 'Plus Jakarta Sans'; src: url('assets/fonts/PlusJakartaSans-700.woff2') format('woff2'); font-weight: 700; }
+    @font-face { font-family: 'Space Grotesk'; src: url('assets/fonts/SpaceGrotesk-500.woff2') format('woff2'); font-weight: 500; }
+    @font-face { font-family: 'Space Grotesk'; src: url('assets/fonts/SpaceGrotesk-700.woff2') format('woff2'); font-weight: 700; }
+    :root {
+      --bg-void: #040508;
+      --glass-surface: rgba(14, 16, 26, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-specular: rgba(255, 255, 255, 0.18);
+      --accent-lime: #CEFF00;
+      --accent-cyan: #00F5FF;
+      --accent-violet: #8438FF;
+      --text-main: #FFFFFF;
+      --text-muted: rgba(255, 255, 255, 0.55);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body { width: 1920px; height: 1080px; background-color: var(--bg-void); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-main); overflow: hidden; position: relative; }
+    .viewport-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(160px); will-change: transform, opacity; opacity: 0.35; }
+    .orb-left { width: 950px; height: 950px; background: radial-gradient(circle, var(--accent-violet) 0%, transparent 70%); top: -250px; left: -200px; }
+    .orb-right { width: 850px; height: 850px; background: radial-gradient(circle, rgba(206, 255, 0, 0.35) 0%, transparent 70%); bottom: -200px; right: -150px; }
+    .grid-matrix { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 96px 96px; mask-image: radial-gradient(circle at center, black 35%, transparent 85%); }
+    .hud-bar { position: absolute; top: 48px; right: 64px; z-index: 100; display: flex; gap: 24px; font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.4); }
+    .hud-bar span.active { color: var(--accent-lime); }
+    .camera-rig { position: absolute; inset: 0; z-index: 10; perspective: 1600px; display: flex; align-items: center; justify-content: center; }
+    .scene { position: absolute; width: 1400px; display: flex; flex-direction: column; align-items: center; justify-content: center; visibility: hidden; transform-style: preserve-3d; }
+    .glass-card { background: var(--glass-surface); backdrop-filter: blur(28px) saturate(210%); -webkit-backdrop-filter: blur(28px) saturate(210%); border: 1px solid var(--glass-border); border-radius: 28px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85), 0 15px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 var(--glass-specular); position: relative; overflow: hidden; }
+    .sheen-sweep { position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%); transform: skewX(-25deg); pointer-events: none; }
+    .pill-badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 22px; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px; }
+    .pill-beacon { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-lime); box-shadow: 0 0 12px var(--accent-lime); }
+    .title-mask { overflow: hidden; margin-bottom: 8px; }
+    .display-title { font-family: 'Syne', sans-serif; font-size: 96px; font-weight: 800; line-height: 1.02; letter-spacing: -0.04em; text-transform: uppercase; text-align: center; background: linear-gradient(180deg, #FFFFFF 20%, rgba(255, 255, 255, 0.6) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .display-title span.lime { background: linear-gradient(90deg, var(--accent-lime) 0%, #A4FF00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(206, 255, 0, 0.35); }
+    .lead-copy { font-size: 24px; color: var(--text-muted); margin-top: 24px; max-width: 800px; text-align: center; line-height: 1.5; }
+    .cluster-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; width: 100%; }
+    .node-tile { padding: 44px 36px; display: flex; flex-direction: column; justify-content: space-between; height: 480px; }
+    .node-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 20px; }
+    .node-code { font-family: 'Space Grotesk', monospace; font-size: 13px; color: var(--accent-lime); letter-spacing: 0.1em; }
+    .node-status { font-size: 11px; text-transform: uppercase; padding: 4px 10px; background: rgba(255, 255, 255, 0.05); border-radius: 99px; color: var(--text-muted); letter-spacing: 0.08em; }
+    .node-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px; }
+    .node-label { font-size: 15px; color: var(--text-muted); font-weight: 500; }
+    .progress-track { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; overflow: hidden; margin-top: 24px; position: relative; }
+    .progress-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-violet), var(--accent-lime)); box-shadow: 0 0 10px var(--accent-lime); }
+    .benchmark-card { padding: 80px 100px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .benchmark-stat { font-family: 'Syne', sans-serif; font-size: 150px; font-weight: 800; line-height: 0.95; letter-spacing: -0.05em; background: linear-gradient(135deg, #FFFFFF 20%, var(--accent-lime) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 16px 0; text-shadow: 0 20px 60px rgba(206, 255, 0, 0.25); }
+    .metrics-row { display: flex; gap: 48px; margin-top: 36px; }
+    .metric-col { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+    .metric-big { font-family: 'Space Grotesk', monospace; font-size: 28px; font-weight: 700; color: #FFFFFF; }
+    .metric-sub { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .brand-hero { font-family: 'Syne', sans-serif; font-size: 110px; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
+    .cta-pill { margin-top: 40px; padding: 22px 56px; background: rgba(206, 255, 0, 0.08); border: 1px solid var(--accent-lime); border-radius: 999px; display: inline-flex; align-items: center; gap: 16px; font-family: 'Space Grotesk', monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-lime); box-shadow: 0 15px 40px -10px rgba(206, 255, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .blur-target-y { filter: url(#motionBlurY); will-change: transform, filter; }
+    .blur-target-x { filter: url(#motionBlurX); will-change: transform, filter; }
+  </style>
+</head>
+<body>
+  <svg style="position: absolute; width: 0; height: 0; pointer-events: none;">
+    <filter id="motionBlurY"><feGaussianBlur id="blurValY" stdDeviation="0, 0" /></filter>
+    <filter id="motionBlurX"><feGaussianBlur id="blurValX" stdDeviation="0, 0" /></filter>
+  </svg>
+  <div class="viewport-canvas">
+    <div class="grid-matrix"></div>
+    <div class="ambient-orb orb-left" id="orbLeft"></div>
+    <div class="ambient-orb orb-right" id="orbRight"></div>
+  </div>
+  <div class="hud-bar">
+    <span>HYPERFRAMES // REAL-TIME MOTION BLUR</span>
+    <span class="active" id="timerReadout">00.00s</span>
+  </div>
+  <main class="camera-rig" id="cameraRig">
+    <section class="scene" id="scene1">
+      <div class="pill-badge" id="badge1"><span class="pill-beacon"></span><span>Aethel Quantum Core 1.0</span></div>
+      <div class="title-mask"><h1 class="display-title line1 blur-target-y">Zero Latency.</h1></div>
+      <div class="title-mask"><h1 class="display-title line1 blur-target-y">Pure <span class="lime">Velocity.</span></h1></div>
+      <p class="lead-copy" id="lead1">Breaking the architectural limits of distributed high-frequency computation.</p>
+    </section>
+    <section class="scene" id="scene2">
+      <div class="pill-badge" id="badge2"><span class="pill-beacon"></span><span>Hyper-Spatial Matrix Nodes</span></div>
+      <div class="cluster-grid blur-target-x" id="gridAct2">
+        <div class="glass-card node-tile">
+          <div class="sheen-sweep sheen"></div>
+          <div class="node-top"><span class="node-code">CLUSTER // ALPHA</span><span class="node-status">Coherent</span></div>
+          <div><div class="node-num">0.002ms</div><div class="node-label">Synaptic Edge Latency</div><div class="progress-track"><div class="progress-fill bar-fill"></div></div></div>
+        </div>
+        <div class="glass-card node-tile">
+          <div class="sheen-sweep sheen"></div>
+          <div class="node-top"><span class="node-code">CLUSTER // BETA</span><span class="node-status">Active Vault</span></div>
+          <div><div class="node-num">99.999%</div><div class="node-label">Quantum State Fidelity</div><div class="progress-track"><div class="progress-fill bar-fill"></div></div></div>
+        </div>
+        <div class="glass-card node-tile">
+          <div class="sheen-sweep sheen"></div>
+          <div class="node-top"><span class="node-code">CLUSTER // DELTA</span><span class="node-status">Hyper-Dense</span></div>
+          <div><div class="node-num">240 T/s</div><div class="node-label">Throughput Operations</div><div class="progress-track"><div class="progress-fill bar-fill"></div></div></div>
+        </div>
+      </div>
+    </section>
+    <section class="scene" id="scene3">
+      <div class="glass-card benchmark-card blur-target-y" id="benchPanel">
+        <div class="sheen-sweep sheen-bench"></div>
+        <div class="pill-badge"><span class="pill-beacon"></span><span>Verified Stress Benchmark</span></div>
+        <div class="benchmark-stat" id="bigStat">100,000x</div>
+        <p class="lead-copy" style="margin-top: 0; max-width: 650px;">Scalable execution speed surpassing legacy web3 networks and cloud silos.</p>
+        <div class="metrics-row">
+          <div class="metric-col"><span class="metric-big">0.0001ms</span><span class="metric-sub">Deterministic Route</span></div>
+          <div class="metric-col"><span class="metric-big">1.4B+</span><span class="metric-sub">Simultaneous Nodes</span></div>
+          <div class="metric-col"><span class="metric-big">Zero</span><span class="metric-sub">State Collision</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="scene" id="scene4">
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <div class="pill-badge" id="badge4"><span class="pill-beacon"></span><span>Ecosystem Gateway</span></div>
+        <h1 class="brand-hero" id="brandTitle">AETHEL <span style="color: var(--accent-lime);">// OS</span></h1>
+        <p class="lead-copy" id="lead4" style="margin-top: 0;">The next era of high-frequency autonomous computing is now live.</p>
+        <div class="cta-pill" id="ctaBtn"><span>Initialize Protocol Node</span><span id="ctaArrow">&rarr;</span></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const master = gsap.timeline({ defaults: { ease: "power4.out" } });
+    const cinematicEase = "power4.out";
+    const blurY = document.querySelector("#blurValY");
+    const blurX = document.querySelector("#blurValX");
+    master.to({}, { duration: 30.0, onUpdate: function() { const t = master.time().toFixed(2); document.getElementById("timerReadout").innerText = (t < 10 ? "0" + t : t) + "s"; } }, 0);
+    master.set("#scene1", { visibility: "visible" }, 0.0);
+    master.to("#orbLeft", { scale: 1.25, opacity: 0.55, duration: 7, ease: "sine.inOut" }, 0.0);
+    master.to("#orbRight", { scale: 1.3, opacity: 0.45, duration: 7, ease: "sine.inOut" }, 0.0);
+    master.fromTo("#badge1", { y: -25, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }, 0.4);
+    master.fromTo(blurY, { attr: { stdDeviation: "0, 0" } }, { attr: { stdDeviation: "0, 36" }, duration: 0.25, ease: "power2.in" }, 0.7);
+    master.to(blurY, { attr: { stdDeviation: "0, 0" }, duration: 0.85, ease: "power4.out" }, 0.95);
+    master.fromTo(".line1", { yPercent: 130, skewY: 3 }, { yPercent: 0, skewY: 0, stagger: 0.12, duration: 1.3, ease: cinematicEase }, 0.7);
+    master.fromTo("#lead1", { y: 25, opacity: 0, filter: "blur(10px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.1 }, 1.4);
+    master.to("#scene1", { z: -450, opacity: 0, filter: "blur(22px)", duration: 1.0, ease: "power3.in" }, 6.0);
+    master.set("#scene1", { visibility: "hidden" }, 7.0);
+    master.set("#scene2", { visibility: "visible" }, 7.0);
+    master.fromTo(blurX, { attr: { stdDeviation: "0, 0" } }, { attr: { stdDeviation: "42, 0" }, duration: 0.2, ease: "power2.in" }, 7.0);
+    master.to(blurX, { attr: { stdDeviation: "0, 0" }, duration: 1.0, ease: "power4.out" }, 7.2);
+    master.fromTo(".node-tile", { x: 160, opacity: 0, scale: 0.9 }, { x: 0, opacity: 1, scale: 1, stagger: 0.15, duration: 1.5, ease: cinematicEase }, 7.1);
+    master.fromTo("#badge2", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 1.0 }, 7.4);
+    master.to(".bar-fill", { width: "100%", stagger: 0.18, duration: 2.2, ease: "power2.out" }, 8.5);
+    master.fromTo(".sheen", { left: "-120%" }, { left: "220%", stagger: 0.18, duration: 1.5, ease: "power2.inOut" }, 9.3);
+    master.to(blurX, { attr: { stdDeviation: "38, 0" }, duration: 0.4, ease: "power2.in" }, 13.8);
+    master.to(".node-tile", { x: -160, opacity: 0, stagger: 0.08, duration: 0.85, ease: "power3.in" }, 13.9);
+    master.to(blurX, { attr: { stdDeviation: "0, 0" }, duration: 0.1 }, 14.9);
+    master.set("#scene2", { visibility: "hidden" }, 15.0);
+    master.set("#scene3", { visibility: "visible" }, 15.0);
+    master.fromTo("#benchPanel", { scale: 0.75, opacity: 0, z: -200 }, { scale: 1, opacity: 1, z: 0, duration: 1.5, ease: cinematicEase }, 15.2);
+    master.fromTo("#bigStat", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.4, ease: "elastic.out(1, 0.75)" }, 15.7);
+    master.fromTo(".metric-col", { y: 35, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.12, duration: 1.0, ease: cinematicEase }, 16.5);
+    master.fromTo(".sheen-bench", { left: "-120%" }, { left: "220%", duration: 1.8, ease: "power2.inOut" }, 17.5);
+    master.to("#benchPanel", { scale: 1.15, opacity: 0, filter: "blur(24px)", duration: 0.9, ease: "power3.in" }, 22.1);
+    master.set("#scene3", { visibility: "hidden" }, 23.0);
+    master.set("#scene4", { visibility: "visible" }, 23.0);
+    master.fromTo("#badge4", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0 }, 23.2);
+    master.fromTo("#brandTitle", { scale: 0.85, opacity: 0, filter: "blur(18px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: cinematicEase }, 23.6);
+    master.fromTo("#lead4", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }, 24.2);
+    master.fromTo("#ctaBtn", { y: 40, opacity: 0, scale: 0.92 }, { y: 0, opacity: 1, scale: 1, duration: 1.3, ease: "back.out(1.7)" }, 24.8);
+    master.to("#ctaArrow", { x: 8, repeat: 3, yoyo: true, duration: 0.5, ease: "sine.inOut" }, 26.0);
+    master.to("#scene4", { y: -8, duration: 3.5, ease: "sine.inOut" }, 25.0);
+    master.to(["#scene4", ".hud-bar"], { opacity: 0, scale: 0.97, filter: "blur(14px)", duration: 0.8, ease: "power2.in" }, 29.2);
+    master.to([".ambient-orb", ".grid-matrix"], { opacity: 0, duration: 0.7, ease: "power2.in" }, 29.3);
+  </script>
+</body>
+</html>
