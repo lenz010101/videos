@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 (async () => {
+  console.log('node ' + process.version + ' | puppeteer ' + require('puppeteer/package.json').version);
   const fps = 60;
   const duration = 30;
   const totalFrames = fps * duration;
@@ -16,14 +17,24 @@ const path = require('path');
   fs.mkdirSync(framesDir, { recursive: true });
   console.log('Slice ' + slice + '/' + slices + ': frames ' + start + '-' + end);
 
+  console.log('Launching chrome...');
   const browser = await puppeteer.launch({
     headless: 'new',
     args: ['--window-size=1920,1080', '--no-sandbox', '--disable-dev-shm-usage', '--force-device-scale-factor=1']
   });
+  console.log('Chrome launched: ' + await browser.version());
   const page = await browser.newPage();
   await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
-  await page.goto('file://' + path.join(dir, 'index.html'), { waitUntil: 'networkidle0', timeout: 120000 });
+  page.on('console', (m) => console.log('[page:' + m.type() + '] ' + m.text()));
+  page.on('pageerror', (e) => console.log('[pageerror] ' + e.message));
+  page.on('requestfailed', (r) => console.log('[reqfail] ' + r.url() + ' :: ' + (r.failure() && r.failure().errorText)));
+  console.log('Goto index.html...');
+  await page.goto('file://' + path.join(dir, 'index.html'), { waitUntil: 'load', timeout: 60000 });
+  console.log('Loaded. Waiting for master...');
+  await page.waitForFunction("typeof gsap !== 'undefined'", { timeout: 60000 });
+  console.log('gsap OK. Waiting for master...');
   await page.waitForFunction("typeof master !== 'undefined' && master.totalDuration() >= 30", { timeout: 90000 });
+  console.log('master OK, totalDuration=' + (await page.evaluate(() => master.totalDuration())));
   await page.evaluate(async () => { try { await document.fonts.ready; } catch (e) {} });
   await page.evaluate(() => master.pause());
   await new Promise((r) => setTimeout(r, 1500));
@@ -37,4 +48,4 @@ const path = require('path');
   }
   await browser.close();
   console.log('Slice ' + slice + ' OK (' + (end - start + 1) + ' frames)');
-})().catch((e) => { console.error('FATAL', e); process.exit(1); });
+})().catch((e) => { console.error('FATAL ' + (e && e.stack || e)); process.exit(1); });
