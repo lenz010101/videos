@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  render:
+  render-slice:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        slice: [0, 1, 2, 3]
     defaults:
       run:
         working-directory: nexus-one
@@ -28,13 +32,39 @@ jobs:
       - name: Install Chrome with deps
         run: npx puppeteer browsers install chrome --with-deps
 
-      - name: Render frames + MP4
-        run: node render.cjs
+      - name: Render slice
+        run: SLICES=4 SLICE=${{ matrix.slice }} node render.cjs
+
+      - name: Upload slice frames
+        uses: actions/upload-artifact@v4
+        with:
+          name: frames-slice-${{ matrix.slice }}
+          path: nexus-one/frames-slice-${{ matrix.slice }}/
+          if-no-files-found: error
+          retention-days: 1
+
+  combine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: render-slice
+    steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Download all slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: frames-slice-*
+          path: frames
+          merge-multiple: true
+
+      - name: Build MP4
+        run: ffmpeg -y -framerate 60 -i "frames/frame_%05d.jpg" -c:v libx264 -pix_fmt yuv420p -crf 17 nexus-one-30s.mp4
 
       - name: Upload MP4
         uses: actions/upload-artifact@v4
         with:
           name: nexus-one-30s
-          path: nexus-one/renders/nexus-one-30s.mp4
+          path: nexus-one-30s.mp4
           if-no-files-found: error
           retention-days: 14
