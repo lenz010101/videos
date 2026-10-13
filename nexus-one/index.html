@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0" />
+  <title>Hyperframes - NEXUS 30s Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --bg-void: #05060A;
+      --glass-base: rgba(14, 16, 26, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-specular: rgba(255, 255, 255, 0.18);
+      --accent-lime: #CEFF00;
+      --accent-cyan: #00F5FF;
+      --accent-violet: #8438FF;
+      --text-pure: #FFFFFF;
+      --text-dim: rgba(255, 255, 255, 0.6);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body { width: 1920px; height: 1080px; background-color: var(--bg-void); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-pure); overflow: hidden; position: relative; }
+    .viewport-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .ambient-orb { position: absolute; border-radius: 50%; filter: blur(160px); will-change: transform, opacity; opacity: 0.35; }
+    .orb-left { width: 900px; height: 900px; background: radial-gradient(circle, var(--accent-violet) 0%, transparent 70%); top: -200px; left: -200px; }
+    .orb-right { width: 800px; height: 800px; background: radial-gradient(circle, rgba(206, 255, 0, 0.35) 0%, transparent 70%); bottom: -200px; right: -100px; }
+    .grid-matrix { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px); background-size: 96px 96px; mask-image: radial-gradient(circle at center, black 30%, transparent 85%); }
+    .camera-rig { position: absolute; inset: 0; z-index: 10; perspective: 1600px; display: flex; align-items: center; justify-content: center; }
+    .scene { position: absolute; width: 1400px; display: flex; flex-direction: column; align-items: center; justify-content: center; visibility: hidden; transform-style: preserve-3d; }
+    .glass-panel { background: var(--glass-base); backdrop-filter: blur(28px) saturate(200%); -webkit-backdrop-filter: blur(28px) saturate(200%); border: 1px solid var(--glass-border); border-radius: 28px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.85), 0 15px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 var(--glass-specular); position: relative; overflow: hidden; }
+    .pill-badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 20px; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); font-family: 'Space Grotesk', monospace; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px; }
+    .pill-beacon { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime); }
+    .sheen-layer { position: absolute; top: 0; left: -150%; width: 100%; height: 100%; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%); transform: skewX(-25deg); pointer-events: none; }
+    .title-mask { overflow: hidden; margin-bottom: 6px; }
+    .syne-hero { font-family: 'Syne', sans-serif; font-size: 96px; font-weight: 800; line-height: 1.02; letter-spacing: -0.04em; text-transform: uppercase; text-align: center; background: linear-gradient(180deg, #FFFFFF 15%, rgba(255, 255, 255, 0.55) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .highlight-lime { background: linear-gradient(90deg, var(--accent-lime) 0%, #A4FF00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(206, 255, 0, 0.35); }
+    .lead-text { font-size: 24px; color: var(--text-dim); margin-top: 24px; max-width: 780px; text-align: center; line-height: 1.5; }
+    .cluster-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; width: 100%; }
+    .node-card { padding: 44px 36px; display: flex; flex-direction: column; justify-content: space-between; height: 480px; }
+    .node-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 20px; }
+    .node-index { font-family: 'Space Grotesk', monospace; font-size: 13px; color: var(--accent-lime); letter-spacing: 0.1em; }
+    .node-state { font-size: 11px; text-transform: uppercase; padding: 4px 10px; background: rgba(255, 255, 255, 0.05); border-radius: 99px; letter-spacing: 0.08em; color: var(--text-dim); }
+    .node-metric-num { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 8px; }
+    .node-metric-lbl { font-size: 15px; color: var(--text-dim); font-weight: 500; }
+    .live-wave-bar { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; overflow: hidden; margin-top: 24px; position: relative; }
+    .live-wave-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-violet), var(--accent-lime)); box-shadow: 0 0 10px var(--accent-lime); }
+    .benchmark-stage { padding: 80px 100px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .huge-multiplier { font-family: 'Syne', sans-serif; font-size: 160px; font-weight: 800; line-height: 0.95; letter-spacing: -0.05em; background: linear-gradient(135deg, #FFFFFF 20%, var(--accent-lime) 80%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 16px 0; text-shadow: 0 20px 60px rgba(206, 255, 0, 0.2); }
+    .benchmark-tags { display: flex; gap: 40px; margin-top: 36px; }
+    .tag-item { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+    .tag-val { font-family: 'Space Grotesk', monospace; font-size: 26px; font-weight: 700; color: #FFFFFF; }
+    .tag-name { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+    .final-stage { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .brand-mark { font-family: 'Syne', sans-serif; font-size: 110px; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
+    .cta-button { margin-top: 40px; padding: 22px 56px; background: rgba(206, 255, 0, 0.08); border: 1px solid var(--accent-lime); border-radius: 999px; display: inline-flex; align-items: center; gap: 16px; font-family: 'Space Grotesk', monospace; font-size: 16px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-lime); box-shadow: 0 15px 40px -10px rgba(206, 255, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .cta-arrow { font-size: 20px; }
+    .global-telemetry { position: absolute; top: 48px; right: 64px; z-index: 50; font-family: 'Space Grotesk', monospace; font-size: 14px; letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.35); display: flex; gap: 20px; }
+    .global-telemetry span.active { color: var(--accent-lime); }
+  </style>
+</head>
+<body>
+  <div class="viewport-canvas">
+    <div class="grid-matrix"></div>
+    <div class="ambient-orb orb-left" id="orbLeft"></div>
+    <div class="ambient-orb orb-right" id="orbRight"></div>
+  </div>
+  <div class="global-telemetry">
+    <span>HYPERFRAMES // 30.00s</span>
+    <span class="active" id="timerReadout">00.00s</span>
+  </div>
+  <main class="camera-rig" id="cameraRig">
+    <section class="scene" id="scene1">
+      <div class="pill-badge" id="badge1">
+        <span class="pill-beacon"></span>
+        <span>Protocol Architecture 0.1</span>
+      </div>
+      <div class="title-mask">
+        <h1 class="syne-hero line1">Centralized Cloud</h1>
+      </div>
+      <div class="title-mask">
+        <h1 class="syne-hero line1">Is Now <span class="highlight-lime">Obsolete.</span></h1>
+      </div>
+      <p class="lead-text" id="lead1">Transitioning global workloads to an autonomous, distributed micro-layer. Zero centralized failure points.</p>
+    </section>
+    <section class="scene" id="scene2">
+      <div class="pill-badge" id="badge2">
+        <span class="pill-beacon"></span>
+        <span>Dynamic Cluster Distribution</span>
+      </div>
+      <div class="cluster-grid">
+        <div class="glass-panel node-card">
+          <div class="sheen-layer sheen"></div>
+          <div class="node-head"><span class="node-index">NODE // 01</span><span class="node-state">Optic Mesh</span></div>
+          <div class="node-body">
+            <div class="node-metric-num">0.08ms</div>
+            <div class="node-metric-lbl">Sub-Quantum Latency</div>
+            <div class="live-wave-bar"><div class="live-wave-fill bar-fill"></div></div>
+          </div>
+        </div>
+        <div class="glass-panel node-card">
+          <div class="sheen-layer sheen"></div>
+          <div class="node-head"><span class="node-index">NODE // 02</span><span class="node-state">Active Vault</span></div>
+          <div class="node-body">
+            <div class="node-metric-num">99.99%</div>
+            <div class="node-metric-lbl">Coherent Redundancy</div>
+            <div class="live-wave-bar"><div class="live-wave-fill bar-fill"></div></div>
+          </div>
+        </div>
+        <div class="glass-panel node-card">
+          <div class="sheen-layer sheen"></div>
+          <div class="node-head"><span class="node-index">NODE // 03</span><span class="node-state">Neural Core</span></div>
+          <div class="node-body">
+            <div class="node-metric-num">124 T/s</div>
+            <div class="node-metric-lbl">Synthetic Bandwidth</div>
+            <div class="live-wave-bar"><div class="live-wave-fill bar-fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="scene" id="scene3">
+      <div class="glass-panel benchmark-stage" id="benchPanel">
+        <div class="sheen-layer sheen-bench"></div>
+        <div class="pill-badge"><span class="pill-beacon"></span><span>Validated Throughput Benchmark</span></div>
+        <div class="huge-multiplier" id="multiplier">10,000x</div>
+        <p class="lead-text" style="margin-top: 0; max-width: 620px;">Faster transaction finality compared to legacy monolithic server networks.</p>
+        <div class="benchmark-tags">
+          <div class="tag-item"><span class="tag-val">0.0012ms</span><span class="tag-name">Edge Routing</span></div>
+          <div class="tag-item"><span class="tag-val">100M+</span><span class="tag-name">Ops Per Second</span></div>
+          <div class="tag-item"><span class="tag-val">Zero</span><span class="tag-name">State Drift</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="scene" id="scene4">
+      <div class="final-stage">
+        <div class="pill-badge" id="badge4"><span class="pill-beacon"></span><span>Access The Grid</span></div>
+        <h1 class="brand-mark" id="brandTitle">NEXUS <span class="highlight-lime">// ONE</span></h1>
+        <p class="lead-text" id="lead4" style="margin-top: 0;">The computational infrastructure for the next century of autonomous computing.</p>
+        <div class="cta-button" id="ctaBtn"><span>Deploy Cluster Node</span><span class="cta-arrow">&rarr;</span></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const master = gsap.timeline({ defaults: { ease: "power4.out" } });
+    const cinematicEase = "power4.out";
+    const camEase = "expo.inOut";
+    master.to({}, { duration: 30.0, onUpdate: function() { const t = master.time().toFixed(2); document.getElementById("timerReadout").innerText = (t < 10 ? "0" + t : t) + "s"; } }, 0);
+    master.set("#scene1", { visibility: "visible" }, 0.0);
+    master.to("#orbLeft", { scale: 1.25, opacity: 0.5, duration: 7, ease: "sine.inOut" }, 0.0);
+    master.to("#orbRight", { scale: 1.3, opacity: 0.45, duration: 7, ease: "sine.inOut" }, 0.0);
+    master.fromTo("#badge1", { y: -25, opacity: 0, filter: "blur(8px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.2 }, 0.5);
+    master.fromTo(".line1", { yPercent: 125, skewY: 3 }, { yPercent: 0, skewY: 0, stagger: 0.14, duration: 1.4, ease: cinematicEase }, 0.8);
+    master.fromTo("#lead1", { y: 30, opacity: 0, filter: "blur(10px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 1.2 }, 1.4);
+    master.to("#scene1", { rotationX: -2, y: -15, duration: 4.5, ease: "sine.inOut" }, 1.8);
+    master.to("#scene1", { z: -400, opacity: 0, filter: "blur(20px)", duration: 1.0, ease: "power3.in" }, 6.0);
+    master.set("#scene1", { visibility: "hidden" }, 7.0);
+    master.set("#scene2", { visibility: "visible" }, 7.0);
+    master.fromTo(".node-card", { y: 120, rotationY: -8, opacity: 0, scale: 0.88, filter: "blur(16px)" }, { y: 0, rotationY: 0, opacity: 1, scale: 1, filter: "blur(0px)", stagger: 0.16, duration: 1.6, ease: cinematicEase }, 7.2);
+    master.fromTo("#badge2", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 1.0 }, 7.5);
+    master.to(".bar-fill", { width: "100%", stagger: 0.2, duration: 2.2, ease: "power2.out" }, 8.6);
+    master.fromTo(".sheen", { left: "-120%" }, { left: "220%", stagger: 0.2, duration: 1.5, ease: "power2.inOut" }, 9.5);
+    master.to(".cluster-grid", { rotationY: 4, rotationX: -2, duration: 4.0, ease: "sine.inOut" }, 9.0);
+    master.to(".node-card", { x: -120, opacity: 0, filter: "blur(18px)", stagger: 0.08, duration: 0.9, ease: "power3.in" }, 14.0);
+    master.to("#badge2", { opacity: 0, duration: 0.5 }, 14.2);
+    master.set("#scene2", { visibility: "hidden" }, 15.0);
+    master.set("#scene3", { visibility: "visible" }, 15.0);
+    master.fromTo("#benchPanel", { scale: 0.8, z: -200, rotationX: 10, opacity: 0, filter: "blur(24px)" }, { scale: 1, z: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", duration: 1.6, ease: cinematicEase }, 15.2);
+    master.fromTo("#multiplier", { scale: 0.5, opacity: 0, filter: "blur(14px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.3, ease: "elastic.out(1, 0.75)" }, 15.8);
+    master.fromTo(".tag-item", { y: 35, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.12, duration: 1.0, ease: cinematicEase }, 16.6);
+    master.fromTo(".sheen-bench", { left: "-120%" }, { left: "220%", duration: 1.8, ease: "power2.inOut" }, 17.5);
+    master.to("#orbRight", { opacity: 0.7, scale: 1.45, duration: 2.0, ease: "sine.inOut" }, 18.0);
+    master.to("#benchPanel", { scale: 1.15, opacity: 0, filter: "blur(24px)", duration: 0.9, ease: "power3.in" }, 22.1);
+    master.set("#scene3", { visibility: "hidden" }, 23.0);
+    master.set("#scene4", { visibility: "visible" }, 23.0);
+    master.fromTo("#badge4", { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0 }, 23.2);
+    master.fromTo("#brandTitle", { scale: 0.85, opacity: 0, filter: "blur(16px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.5, ease: cinematicEase }, 23.6);
+    master.fromTo("#lead4", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2 }, 24.2);
+    master.fromTo("#ctaBtn", { y: 40, opacity: 0, scale: 0.92, boxShadow: "0 0 0 rgba(206, 255, 0, 0)" }, { y: 0, opacity: 1, scale: 1, boxShadow: "0 15px 40px -10px rgba(206, 255, 0, 0.4)", duration: 1.3, ease: "back.out(1.7)" }, 24.8);
+    master.to(".cta-arrow", { x: 8, repeat: 3, yoyo: true, duration: 0.5, ease: "sine.inOut" }, 26.0);
+    master.to("#scene4", { y: -10, duration: 3.5, ease: "sine.inOut" }, 25.0);
+    master.to(["#scene4", ".global-telemetry"], { opacity: 0, scale: 0.98, filter: "blur(12px)", duration: 0.8, ease: "power2.in" }, 29.2);
+    master.to([".ambient-orb", ".grid-matrix"], { opacity: 0, duration: 0.7, ease: "power2.in" }, 29.3);
+  </script>
+</body>
+</html>
