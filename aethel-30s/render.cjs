@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 (async () => {
   console.log('node ' + process.version + ' | puppeteer ' + require('puppeteer/package.json').version);
-  const fps = 60, duration = 30, totalFrames = fps * duration;
+  const fps = 30, duration = 30, totalFrames = fps * duration;
   const slices = parseInt(process.env.SLICES || '1', 10);
   const slice = parseInt(process.env.SLICE || '0', 10);
   const per = Math.ceil((totalFrames + 1) / slices);
