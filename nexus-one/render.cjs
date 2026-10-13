@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,11 +6,15 @@ const path = require('path');
   const fps = 60;
   const duration = 30;
   const totalFrames = fps * duration;
+  const slices = parseInt(process.env.SLICES || '1', 10);
+  const slice = parseInt(process.env.SLICE || '0', 10);
+  const per = Math.ceil((totalFrames + 1) / slices);
+  const start = slice * per;
+  const end = Math.min(start + per - 1, totalFrames);
   const dir = __dirname;
-  const framesDir = path.join(dir, 'frames');
-  const rendersDir = path.join(dir, 'renders');
+  const framesDir = path.join(dir, 'frames-slice-' + slice);
   fs.mkdirSync(framesDir, { recursive: true });
-  fs.mkdirSync(rendersDir, { recursive: true });
+  console.log('Slice ' + slice + '/' + slices + ': frames ' + start + '-' + end);
 
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -25,16 +28,13 @@ const path = require('path');
   await page.evaluate(() => master.pause());
   await new Promise((r) => setTimeout(r, 1500));
 
-  for (let i = 0; i <= totalFrames; i++) {
+  for (let i = start; i <= end; i++) {
     const time = (i / totalFrames) * duration;
     await page.evaluate((t) => master.seek(t), time);
     const frameNum = String(i).padStart(5, '0');
     await page.screenshot({ path: framesDir + '/frame_' + frameNum + '.jpg', type: 'jpeg', quality: 92 });
-    if (i % 120 === 0) console.log('Progreso: ' + (i / fps).toFixed(1) + 's / ' + duration + 's');
+    if ((i - start) % 120 === 0) console.log('Slice ' + slice + ' progreso: ' + (i / fps).toFixed(1) + 's / ' + duration + 's');
   }
   await browser.close();
-
-  console.log('Compilando MP4...');
-  execSync('ffmpeg -y -framerate ' + fps + ' -i "' + framesDir + '/frame_%05d.jpg" -c:v libx264 -pix_fmt yuv420p -crf 17 "' + path.join(rendersDir, 'nexus-one-30s.mp4') + '"', { stdio: 'inherit' });
-  console.log('OK renders/nexus-one-30s.mp4');
+  console.log('Slice ' + slice + ' OK (' + (end - start + 1) + ' frames)');
 })().catch((e) => { console.error('FATAL', e); process.exit(1); });
