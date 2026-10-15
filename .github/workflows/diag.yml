@@ -1,0 +1,64 @@
+name: DIAG — isolate the per-frame cost
+
+# Measures the renderer's own capture calibration (p95 ms/frame) for three
+# compositions in parallel, so we stop guessing what makes each frame cost 28s.
+#   diag-video.html    -> video only      (no grading, no overlay, no transform)
+#   diag-nograde.html  -> overlays + CSS transform, no grading
+#   index.html         -> the real composition (grading ON)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'carrito-gastro/diag-*.html'
+      - '.github/workflows/diag.yml'
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        comp: [diag-video.html, diag-nograde.html, index.html]
+    defaults:
+      run:
+        working-directory: carrito-gastro
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/hfs
+          key: hfs-${{ runner.os }}-chrome-headless-shell-stable
+
+      - name: Install chrome-headless-shell
+        run: |
+          BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell 2>/dev/null | head -n 1)
+          if [ -z "$BIN" ]; then
+            npx --yes @puppeteer/browsers install chrome-headless-shell@stable --path "$HOME/.cache/hfs"
+            BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell | head -n 1)
+          fi
+          echo "HYPERFRAMES_BROWSER_PATH=$BIN" >> "$GITHUB_ENV"
+
+      # Same source treatment as the real pipeline, so the comparison is apples to apples.
+      - name: Re-encode source with dense keyframes
+        run: |
+          mv assets/source.mp4 assets/source.orig.mp4
+          ffmpeg -y -v error -i assets/source.orig.mp4 \
+            -c:v libx264 -r 30 -g 30 -keyint_min 30 \
+            -crf 15 -preset medium -pix_fmt yuv420p \
+            -movflags +faststart -c:a copy assets/source.mp4
+
+      - name: Render ${{ matrix.comp }} (calibration is the measurement)
+        run: |
+          npx --yes hyperframes@0.8.156 render \
+            -c ${{ matrix.comp }} \
+            --fps 30 --quality draft \
+            -o renders/diag-${{ matrix.comp }}.mp4
