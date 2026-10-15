@@ -63,10 +63,10 @@ jobs:
         working-directory: carrito-express
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install FFmpeg + fonts
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+        run: command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core)
 
       - name: Contact sheet (full frame, 2 fps, timestamped)
         run: |
@@ -91,7 +91,7 @@ jobs:
           wc -l qa/audio-rms.txt
 
       - name: Upload analysis
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: carrito-express-analysis
           path: carrito-express/qa/*
@@ -107,7 +107,7 @@ jobs:
     timeout-minutes: 40
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -115,13 +115,13 @@ jobs:
           python-version: "3.12"
 
       - name: Cache pip (wheels)
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: pip-${{ runner.os }}-fasterwhisper-1.0.3-av-12.3.0
 
       - name: Cache Whisper model
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/huggingface
           key: hf-${{ runner.os }}-fasterwhisper-${{ github.event.inputs.model || 'small' }}
@@ -154,7 +154,7 @@ jobs:
           PY
 
       - name: Upload transcript artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: carrito-express-transcript
           path: |
@@ -186,27 +186,27 @@ jobs:
         working-directory: carrito-express
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
 
       - name: Cache npm (HyperFrames CLI)
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: npm-${{ runner.os }}-hyperframes-${{ env.HYPERFRAMES_VERSION }}
 
       - name: Cache chrome-headless-shell
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/hfs
           key: hfs-${{ runner.os }}-chrome-headless-shell-stable
 
       - name: Install FFmpeg
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+        run: command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
 
       - name: Install chrome-headless-shell
         run: |
@@ -224,7 +224,7 @@ jobs:
       # invisible. El resultado se cachea: si el source no cambia, no se repite.
       - name: Cache dense-keyframe source
         id: srccache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: carrito-express/assets/normalized.mp4
           key: src-${{ runner.os }}-${{ hashFiles('carrito-express/assets/source.mp4') }}
@@ -265,7 +265,7 @@ jobs:
             -o renders/carrito-express.mp4
 
       - name: Upload rendered video
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: carrito-express-mp4
           path: carrito-express/renders/carrito-express.mp4
@@ -283,7 +283,7 @@ jobs:
           ls -la qa/
 
       - name: Upload QA frames
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: carrito-express-qa-frames
           path: carrito-express/qa/*.png
