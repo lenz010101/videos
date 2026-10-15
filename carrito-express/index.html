@@ -536,12 +536,17 @@
       const DUR = 18.5;
 
       // ── Beat grid: chapter chip windows (seconds) ──
-      // Retime these to the transcript's real sentence boundaries.
+      // Tiempos medidos sobre el material (contact sheet con timecode):
+      //   0.0–3.2  "¡ENTREGA EXPRESS A DOMICILIO!"
+      //   3.3–7.3  "CARRITO LISTO PARA TRABAJAR"
+      //   7.4–11.3 "CLIENTE SATISFECHO = COBRO EN MANO"
+      //  11.4–16.1 "COTIZA TU CARRITO A MEDIDA" + WhatsApp
+      //  16.2–18.5 plano final del carrito (sin cartel)
       const BEATS = [
-        { in: 0.55, out: 4.5 },
-        { in: 4.5, out: 9.0 },
-        { in: 9.0, out: 13.2 },
-        { in: 13.2, out: DUR - 0.35 },
+        { in: 0.55, out: 3.15 },
+        { in: 3.35, out: 7.25 },
+        { in: 7.45, out: 11.2 },
+        { in: 11.4, out: 16.05 },
       ];
 
       const tl = gsap.timeline({ paused: true });
@@ -624,11 +629,10 @@
           b.in + 0.24,
         );
 
-        // exit (skip on the last chip — it holds to the end)
-        if (i < BEATS.length - 1) {
-          tl.to(chip, { autoAlpha: 0, x: -34, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
-          tl.set(chip, { autoAlpha: 0 }, b.out);
-        }
+        // exit — every chip hands over to the next (and the last one clears
+        // the canvas for the closing product shot)
+        tl.to(chip, { autoAlpha: 0, x: -34, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
+        tl.set(chip, { autoAlpha: 0 }, b.out);
 
         // light sweep accent on every beat after the first
         if (i > 0) {
@@ -673,7 +677,10 @@
       );
       tl.to(".pill", { scale: 1.035, duration: 0.9, repeat: 3, yoyo: true, ease: "sine.inOut" }, 13.2);
 
-      // ── End flourish: rule expands + CTA lifts ──
+      // ── End flourish: light sweep on the closing product shot, rule + CTA lift ──
+      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 16.25);
+      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 16.85);
+      tl.to(".pill", { scale: 1.05, duration: 0.6, ease: "back.out(1.6)" }, 16.4);
       tl.to(".pill", { y: -14, duration: 0.7, ease: "power2.out" }, DUR - 0.9);
 
       // ── Progress rail ──
