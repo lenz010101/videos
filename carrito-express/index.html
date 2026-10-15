@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <title>Carrito Express — Motion Graphics (After Effects style)</title>
+    <title>Carrito Gastronómico — Motion Graphics</title>
     <style>
       @font-face {
         font-family: "Anton";
@@ -33,13 +33,31 @@
         font-style: normal;
         font-display: block;
       }
+      @font-face {
+        font-family: "Caveat";
+        src: url("assets/fonts/Caveat-400-latin.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Caveat";
+        src: url("assets/fonts/Caveat-700-latin.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: block;
+      }
 
       :root {
-        --fire: #e8412a;
-        --fire-deep: #b4240f;
-        --amber: #ffc531;
-        --cream: #fff6e6;
-        --ink: #0a0603;
+        --crimson-0: #170103;
+        --crimson-1: #4a0a10;
+        --crimson-2: #8c1119;
+        --crimson-3: #c01b25;
+        --red: #ff2b2b;
+        --white: #ffffff;
+        --cream: #f6ece6;
+        --stroke: rgba(255, 255, 255, 0.86);
+        --hair: rgba(255, 255, 255, 0.3);
       }
 
       * {
@@ -53,7 +71,7 @@
         width: 1080px;
         height: 1920px;
         overflow: hidden;
-        background: var(--ink);
+        background: #000;
         font-family: "Inter", sans-serif;
       }
 
@@ -64,77 +82,62 @@
         overflow: hidden;
       }
 
-      /* ---------- Layer 0 · source footage (untouched, gentle push + drift) ---------- */
+      /* ============ footage ============ */
       .stage {
         position: absolute;
         inset: 0;
         will-change: transform;
       }
-
       #hero {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
       }
-
-      /* ---------- Layer 1 · grade + scrims (readability for the graphics) ---------- */
       .grade {
         position: absolute;
         inset: 0;
         background:
-          radial-gradient(125% 78% at 50% 44%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.5) 100%),
-          linear-gradient(180deg, rgba(10, 6, 3, 0.62) 0%, rgba(10, 6, 3, 0) 30%);
+          radial-gradient(125% 78% at 50% 44%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.58) 100%),
+          linear-gradient(180deg, rgba(8, 2, 3, 0.6) 0%, rgba(8, 2, 3, 0) 28%);
       }
-
       .scrim-b {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        height: 640px;
-        background: linear-gradient(0deg, rgba(10, 6, 3, 0.82) 0%, rgba(10, 6, 3, 0) 100%);
+        height: 620px;
+        background: linear-gradient(0deg, rgba(8, 2, 3, 0.84) 0%, rgba(8, 2, 3, 0) 100%);
       }
 
-      /* ---------- Layer 2 · HUD chrome (AE-style corner brackets) ---------- */
-      .corner {
-        position: absolute;
-        width: 96px;
-        height: 96px;
-        border-color: rgba(255, 197, 49, 0.72);
-        border-style: solid;
-        border-width: 0;
+      /* ============ shared: outline / solid display type ============ */
+      .outline {
+        color: transparent;
+        -webkit-text-stroke: 2.5px var(--stroke);
+        font-family: "Anton", sans-serif;
+        text-transform: uppercase;
+        line-height: 0.95;
+        white-space: nowrap;
       }
-      .corner.tl {
-        top: 40px;
-        left: 40px;
-        border-top-width: 4px;
-        border-left-width: 4px;
-        border-top-left-radius: 18px;
+      .solid {
+        color: var(--red);
+        font-family: "Anton", sans-serif;
+        text-transform: uppercase;
+        line-height: 0.95;
+        white-space: nowrap;
+        text-shadow:
+          0 0 26px rgba(255, 43, 43, 0.75),
+          0 0 70px rgba(255, 43, 43, 0.4),
+          0 3px 0 rgba(120, 8, 12, 0.9);
       }
-      .corner.tr {
-        top: 40px;
-        right: 40px;
-        border-top-width: 4px;
-        border-right-width: 4px;
-        border-top-right-radius: 18px;
-      }
-      .corner.bl {
-        bottom: 40px;
-        left: 40px;
-        border-bottom-width: 4px;
-        border-left-width: 4px;
-        border-bottom-left-radius: 18px;
-      }
-      .corner.br {
-        bottom: 40px;
-        right: 40px;
-        border-bottom-width: 4px;
-        border-right-width: 4px;
-        border-bottom-right-radius: 18px;
+      .script {
+        font-family: "Caveat", cursive;
+        font-weight: 400;
+        color: var(--cream);
+        line-height: 1;
       }
 
-      /* ---------- Layer 3 · light sweep (beat transition accent) ---------- */
+      /* ============ light sweep ============ */
       .sweep {
         position: absolute;
         top: -240px;
@@ -145,194 +148,332 @@
         background: linear-gradient(
           90deg,
           rgba(255, 255, 255, 0) 0%,
-          rgba(255, 197, 49, 0.16) 34%,
+          rgba(255, 120, 120, 0.16) 34%,
           rgba(255, 255, 255, 0.5) 50%,
-          rgba(255, 197, 49, 0.16) 66%,
+          rgba(255, 120, 120, 0.16) 66%,
           rgba(255, 255, 255, 0) 100%
         );
         opacity: 0;
         pointer-events: none;
       }
 
-      /* ---------- Layer 4 · floating particles ---------- */
-      .spark {
+      /* ============ INTRO (full-frame title) ============ */
+      .intro {
         position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .intro-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(90% 62% at 50% 34%, var(--crimson-2) 0%, var(--crimson-1) 46%, var(--crimson-0) 100%),
+          linear-gradient(180deg, #1d0205 0%, #5d0c13 52%, #120102 100%);
+      }
+      .intro-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(70% 46% at 50% 30%, rgba(255, 60, 60, 0.22) 0%, rgba(0, 0, 0, 0) 70%);
+      }
+      .intro-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 236px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #w1 {
+        font-size: 148px;
+        letter-spacing: 8px;
+      }
+      #w2 {
+        font-size: 100px;
+        letter-spacing: 7px;
+        margin-top: 26px;
+      }
+      .intro-kicker {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        letter-spacing: 9px;
+        color: rgba(246, 236, 230, 0.72);
+        text-transform: uppercase;
+        margin-top: 40px;
+      }
+      .conn {
+        width: 2px;
+        height: 0;
+        margin: 30px auto 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 43, 43, 0.7));
+        box-shadow: 0 0 18px rgba(255, 43, 43, 0.7);
+      }
+      .conn-dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        background: var(--amber);
-        box-shadow: 0 0 18px rgba(255, 197, 49, 0.8);
+        background: var(--red);
+        box-shadow: 0 0 20px rgba(255, 43, 43, 0.95);
+        margin: 0 auto;
         opacity: 0;
       }
 
-      /* ---------- Layer 5 · brand lockup ---------- */
-      .brand {
+      /* ============ panels (wireframe cards) ============ */
+      .panels {
         position: absolute;
-        top: 86px;
-        left: 76px;
+        left: 0;
+        right: 0;
+        top: 1010px;
         display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 34px 20px 22px;
-        background: rgba(12, 7, 4, 0.6);
-        border: 1px solid rgba(255, 197, 49, 0.42);
-        border-radius: 28px;
-        backdrop-filter: blur(10px);
+        justify-content: center;
+        gap: 22px;
+      }
+      .panel {
+        position: relative;
+        width: 300px;
+        height: 372px;
+        border: 1.5px solid rgba(255, 255, 255, 0.34);
+        border-radius: 14px;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.34) 100%);
         box-shadow:
-          0 26px 60px rgba(0, 0, 0, 0.5),
-          inset 0 1px 0 rgba(255, 255, 255, 0.09);
+          0 20px 48px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.14);
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        text-align: center;
+        opacity: 0;
+      }
+      .panel .script {
+        font-size: 44px;
+        margin-bottom: 8px;
+      }
+      .panel .tag {
+        font-family: "Anton", sans-serif;
+        font-size: 34px;
+        letter-spacing: 1.5px;
+        color: var(--white);
+        text-transform: uppercase;
+        line-height: 1.02;
+      }
+      .panel .rule {
+        width: 46px;
+        height: 2px;
+        background: var(--red);
+        box-shadow: 0 0 14px rgba(255, 43, 43, 0.9);
+        margin-top: 18px;
+      }
+      .panel .sheen {
+        position: absolute;
+        top: -60px;
+        left: -160px;
+        width: 140px;
+        height: 500px;
+        transform: rotate(18deg);
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.34) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+      }
+      .panels .panel:nth-child(2) {
+        margin-top: 54px;
       }
 
+      /* ============ HUD over the footage ============ */
+      .corner {
+        position: absolute;
+        width: 92px;
+        height: 92px;
+        border-color: rgba(255, 255, 255, 0.75);
+        border-style: solid;
+        border-width: 0;
+      }
+      .corner.tl {
+        top: 44px;
+        left: 44px;
+        border-top-width: 2.5px;
+        border-left-width: 2.5px;
+        border-top-left-radius: 14px;
+      }
+      .corner.tr {
+        top: 44px;
+        right: 44px;
+        border-top-width: 2.5px;
+        border-right-width: 2.5px;
+        border-top-right-radius: 14px;
+      }
+      .corner.bl {
+        bottom: 44px;
+        left: 44px;
+        border-bottom-width: 2.5px;
+        border-left-width: 2.5px;
+        border-bottom-left-radius: 14px;
+      }
+      .corner.br {
+        bottom: 44px;
+        right: 44px;
+        border-bottom-width: 2.5px;
+        border-right-width: 2.5px;
+        border-bottom-right-radius: 14px;
+      }
+
+      .brand {
+        position: absolute;
+        top: 88px;
+        left: 78px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 30px 18px 20px;
+        background: rgba(10, 2, 3, 0.72);
+        border: 1.5px solid rgba(255, 255, 255, 0.34);
+        border-radius: 16px;
+        overflow: hidden;
+      }
       .brand-sheen {
         position: absolute;
         top: -60px;
-        left: -220px;
-        width: 220px;
+        left: -200px;
+        width: 200px;
         height: 300px;
         transform: rotate(18deg);
         background: linear-gradient(
           90deg,
           rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.42) 50%,
+          rgba(255, 255, 255, 0.38) 50%,
           rgba(255, 255, 255, 0) 100%
         );
         opacity: 0;
       }
-
       .dot {
         display: block;
-        width: 56px;
-        height: 56px;
-        border-radius: 18px;
-        background: linear-gradient(140deg, var(--amber), var(--fire));
-        box-shadow: 0 0 30px rgba(255, 197, 49, 0.55);
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 34% 30%, #ff6a6a, var(--red) 62%, #8c0f16 100%);
+        box-shadow: 0 0 26px rgba(255, 43, 43, 0.72);
         flex: none;
       }
-
-      .txt {
+      .brand .name {
+        font-family: "Anton", sans-serif;
+        font-size: 38px;
+        line-height: 1;
+        letter-spacing: 2.5px;
+        color: var(--white);
+        text-transform: uppercase;
+      }
+      .brand .handle {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 17px;
+        letter-spacing: 3.4px;
+        color: rgba(255, 255, 255, 0.66);
+        margin-top: 8px;
+        text-transform: uppercase;
+      }
+      .brand .txt {
         display: flex;
         flex-direction: column;
       }
 
-      .name {
-        font-family: "Anton", sans-serif;
-        font-size: 46px;
-        line-height: 1;
-        letter-spacing: 1px;
-        color: var(--cream);
-        text-transform: uppercase;
-      }
-
-      .handle {
-        font-family: "Inter", sans-serif;
-        font-weight: 700;
-        font-size: 20px;
-        letter-spacing: 2.4px;
-        color: var(--amber);
-        margin-top: 10px;
-        text-transform: uppercase;
-      }
-
-      /* ---------- Layer 6 · chapter HUD (top-right) ---------- */
+      /* chapter chip — outlined, matching the panel language */
       .chapter {
         position: absolute;
         top: 92px;
-        right: 76px;
-        width: 366px;
-        height: 132px;
+        right: 78px;
+        width: 372px;
+        height: 124px;
       }
-
       .chip {
         position: absolute;
         top: 0;
         right: 0;
-        width: 366px;
-        height: 132px;
+        width: 372px;
+        height: 124px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 18px;
-        padding: 0 26px 0 24px;
-        background: rgba(12, 7, 4, 0.62);
-        border: 1px solid rgba(232, 65, 42, 0.5);
-        border-radius: 22px;
-        backdrop-filter: blur(10px);
-        box-shadow:
-          0 22px 50px rgba(0, 0, 0, 0.48),
-          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        gap: 16px;
+        padding: 0 24px 0 22px;
+        background: rgba(10, 2, 3, 0.74);
+        border: 1.5px solid rgba(255, 255, 255, 0.34);
+        border-radius: 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
         opacity: 0;
         overflow: hidden;
       }
-
       .chip-num {
         font-family: "Anton", sans-serif;
-        font-size: 56px;
+        font-size: 58px;
         line-height: 1;
-        color: var(--fire);
-        text-shadow: 0 0 24px rgba(232, 65, 42, 0.55);
+        color: transparent;
+        -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.9);
       }
-
       .chip-rule {
-        width: 5px;
-        height: 62px;
-        border-radius: 3px;
-        background: linear-gradient(180deg, var(--amber), var(--fire));
+        width: 2px;
+        height: 58px;
+        background: linear-gradient(180deg, var(--red), rgba(255, 43, 43, 0.2));
+        box-shadow: 0 0 12px rgba(255, 43, 43, 0.8);
         flex: none;
       }
-
       .chip-body {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
         text-align: right;
       }
-
       .chip-label {
         font-family: "Anton", sans-serif;
-        font-size: 34px;
-        line-height: 1.05;
-        letter-spacing: 0.5px;
-        color: var(--cream);
+        font-size: 30px;
+        line-height: 1.04;
+        letter-spacing: 1.5px;
+        color: var(--white);
         text-transform: uppercase;
       }
-
       .chip-tag {
         font-family: "Inter", sans-serif;
         font-weight: 700;
-        font-size: 17px;
-        letter-spacing: 3px;
-        color: var(--amber);
-        margin-top: 8px;
+        font-size: 15px;
+        letter-spacing: 4px;
+        color: var(--red);
+        margin-top: 7px;
         text-transform: uppercase;
       }
 
-      /* ---------- Layer 7 · bottom CTA ---------- */
+      /* ============ CTA ============ */
       .cta {
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 128px;
+        bottom: 132px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 22px;
+        gap: 20px;
       }
-
       .pill {
         display: flex;
         align-items: center;
         gap: 20px;
-        padding: 24px 48px;
+        padding: 22px 46px;
         border-radius: 999px;
-        background: linear-gradient(90deg, var(--fire), var(--fire-deep));
+        background: linear-gradient(90deg, var(--crimson-3), var(--crimson-1));
+        border: 1.5px solid rgba(255, 255, 255, 0.3);
         box-shadow:
-          0 26px 60px rgba(232, 65, 42, 0.52),
-          inset 0 1px 0 rgba(255, 255, 255, 0.26);
+          0 0 44px rgba(255, 43, 43, 0.42),
+          0 24px 54px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.24);
         position: relative;
         overflow: hidden;
       }
-
       .pill-sheen {
         position: absolute;
         top: -50px;
@@ -343,75 +484,119 @@
         background: linear-gradient(
           90deg,
           rgba(255, 255, 255, 0) 0%,
-          rgba(255, 255, 255, 0.45) 50%,
+          rgba(255, 255, 255, 0.42) 50%,
           rgba(255, 255, 255, 0) 100%
         );
         opacity: 0;
       }
-
       .wa {
-        width: 58px;
-        height: 58px;
+        width: 54px;
+        height: 54px;
         border-radius: 50%;
         background: #25d366;
         display: flex;
         align-items: center;
         justify-content: center;
         flex: none;
-        box-shadow: 0 0 26px rgba(37, 211, 102, 0.55);
+        box-shadow: 0 0 22px rgba(37, 211, 102, 0.55);
       }
-
       .wa svg {
         display: block;
       }
-
       .pill-body {
         display: flex;
         flex-direction: column;
       }
-
       .pill-k {
         font-family: "Inter", sans-serif;
         font-weight: 700;
-        font-size: 21px;
-        letter-spacing: 2.2px;
-        color: var(--amber);
+        font-size: 19px;
+        letter-spacing: 3.2px;
+        color: rgba(255, 255, 255, 0.72);
         text-transform: uppercase;
       }
-
       .pill-v {
         font-family: "Anton", sans-serif;
-        font-size: 46px;
+        font-size: 44px;
         line-height: 1.05;
-        letter-spacing: 1.5px;
-        color: var(--cream);
+        letter-spacing: 2px;
+        color: var(--white);
       }
-
       .cta-sub {
         font-family: "Inter", sans-serif;
         font-weight: 700;
-        font-size: 20px;
-        letter-spacing: 3.6px;
-        color: rgba(255, 246, 230, 0.82);
+        font-size: 17px;
+        letter-spacing: 5px;
+        color: rgba(246, 236, 230, 0.7);
         text-transform: uppercase;
       }
 
-      /* ---------- Layer 8 · progress rail ---------- */
+      /* ============ OUTRO (brand band) ============ */
+      .outro {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 700px;
+        overflow: hidden;
+      }
+      .outro-band {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(23, 1, 3, 0) 0%, rgba(74, 10, 16, 0.94) 34%, #120102 100%);
+        border-top: 1.5px solid rgba(255, 255, 255, 0.24);
+      }
+      .outro-inner {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 132px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #outro-w1 {
+        font-size: 108px;
+        letter-spacing: 6px;
+      }
+      #outro-w2 {
+        font-size: 74px;
+        letter-spacing: 5px;
+        margin-top: 16px;
+      }
+      .outro-rule {
+        width: 0;
+        height: 2px;
+        margin-top: 34px;
+        background: var(--red);
+        box-shadow: 0 0 16px rgba(255, 43, 43, 0.9);
+      }
+      .outro-phone {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        letter-spacing: 6px;
+        color: rgba(255, 255, 255, 0.8);
+        text-transform: uppercase;
+        margin-top: 26px;
+      }
+
+      /* ============ progress ============ */
       .progress {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        height: 9px;
-        background: rgba(255, 246, 230, 0.14);
+        height: 6px;
+        background: rgba(255, 255, 255, 0.12);
       }
-
       .progress .bar {
         display: block;
         width: 100%;
         height: 100%;
         transform-origin: left center;
-        background: linear-gradient(90deg, var(--amber), var(--fire));
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), var(--red));
+        box-shadow: 0 0 14px rgba(255, 43, 43, 0.8);
       }
     </style>
   </head>
@@ -424,7 +609,6 @@
       data-height="1920"
       data-duration="18.5"
     >
-      <!-- Source footage: untouched, only reframed by the non-timed .stage wrapper -->
       <div class="stage">
         <video
           id="hero"
@@ -443,23 +627,49 @@
 
       <div class="sweep" id="sweep"></div>
 
-      <div id="sparks" class="clip" data-start="0" data-duration="18.5">
-        <span class="spark" style="top: 430px; left: 140px"></span>
-        <span class="spark" style="top: 690px; left: 900px"></span>
-        <span class="spark" style="top: 980px; left: 250px"></span>
-        <span class="spark" style="top: 1560px; left: 880px"></span>
-        <span class="spark" style="top: 1720px; left: 200px"></span>
-        <span class="spark" style="top: 1210px; left: 620px"></span>
+      <!-- ===== intro title sting ===== -->
+      <div id="intro" class="clip" data-start="0" data-duration="2.25">
+        <div class="intro">
+          <div class="intro-bg"></div>
+          <div class="intro-inner">
+            <div id="w1" class="outline">Carrito</div>
+            <div id="w2" class="solid">Gastronómico</div>
+            <div class="intro-kicker">Hecho a medida</div>
+            <div class="conn" id="conn"></div>
+            <div class="conn-dot" id="conn-dot"></div>
+          </div>
+          <div class="panels">
+            <div class="panel">
+              <span class="sheen"></span>
+              <span class="script">hecho</span>
+              <span class="tag">A medida</span>
+              <span class="rule"></span>
+            </div>
+            <div class="panel">
+              <span class="sheen"></span>
+              <span class="script">entrega</span>
+              <span class="tag">Express</span>
+              <span class="rule"></span>
+            </div>
+            <div class="panel">
+              <span class="sheen"></span>
+              <span class="script">cotiza</span>
+              <span class="tag">981 121<br />0541</span>
+              <span class="rule"></span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div id="hud" class="clip" data-start="0" data-duration="18.5">
+      <!-- ===== HUD over the footage ===== -->
+      <div id="hud" class="clip" data-start="2.25" data-duration="16.25">
         <span class="corner tl"></span>
         <span class="corner tr"></span>
         <span class="corner bl"></span>
         <span class="corner br"></span>
       </div>
 
-      <div id="brand" class="clip" data-start="0.35" data-duration="18.15">
+      <div id="brand" class="clip" data-start="2.4" data-duration="14.2">
         <span class="brand">
           <span class="brand-sheen"></span>
           <span class="dot"></span>
@@ -470,18 +680,10 @@
         </span>
       </div>
 
-      <div id="chapter" class="clip" data-start="0" data-duration="18.5">
+      <div id="chapter" class="clip" data-start="2.25" data-duration="13.8">
         <span class="chapter">
           <span class="chip">
             <span class="chip-num">01</span>
-            <span class="chip-rule"></span>
-            <span class="chip-body">
-              <span class="chip-label">Entrega<br />express</span>
-              <span class="chip-tag">A domicilio</span>
-            </span>
-          </span>
-          <span class="chip">
-            <span class="chip-num">02</span>
             <span class="chip-rule"></span>
             <span class="chip-body">
               <span class="chip-label">Listo para<br />trabajar</span>
@@ -489,7 +691,7 @@
             </span>
           </span>
           <span class="chip">
-            <span class="chip-num">03</span>
+            <span class="chip-num">02</span>
             <span class="chip-rule"></span>
             <span class="chip-body">
               <span class="chip-label">Cobro en<br />mano</span>
@@ -497,7 +699,7 @@
             </span>
           </span>
           <span class="chip">
-            <span class="chip-num">04</span>
+            <span class="chip-num">03</span>
             <span class="chip-rule"></span>
             <span class="chip-body">
               <span class="chip-label">Hecho a<br />medida</span>
@@ -507,12 +709,12 @@
         </span>
       </div>
 
-      <div id="cta" class="clip" data-start="11.4" data-duration="7.1">
+      <div id="cta" class="clip" data-start="11.4" data-duration="5.2">
         <span class="cta">
           <span class="pill">
             <span class="pill-sheen"></span>
             <span class="wa">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="#0a0603">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="#0a0603">
                 <path
                   d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.54.05-1.05.24-3.53-.73-2.98-1.17-4.85-4.25-5-4.45-.14-.2-1.17-1.56-1.17-2.97 0-1.41.73-2.1 1-2.39.26-.29.58-.36.77-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.14.07.15.12.32.02.51-.09.2-.14.32-.29.49l-.43.5c-.14.14-.29.3-.12.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.33 1.44.29.15.46.12.63-.07.17-.2.73-.85.92-1.15.2-.29.39-.24.65-.15.26.1 1.68.79 1.97.94.29.14.48.22.55.34.07.12.07.7-.17 1.38Z"
                 />
@@ -527,6 +729,19 @@
         </span>
       </div>
 
+      <!-- ===== closing brand band ===== -->
+      <div id="outro" class="clip" data-start="16.7" data-duration="1.8">
+        <div class="outro">
+          <div class="outro-band"></div>
+          <div class="outro-inner">
+            <div id="outro-w1" class="outline">Carrito</div>
+            <div id="outro-w2" class="solid">Gastronómico</div>
+            <div class="outro-rule" id="outro-rule"></div>
+            <div class="outro-phone">WhatsApp · 981 121 0541</div>
+          </div>
+        </div>
+      </div>
+
       <div class="progress"><span class="bar"></span></div>
     </div>
 
@@ -534,16 +749,16 @@
     <script>
       window.__timelines = window.__timelines || {};
       const DUR = 18.5;
+      const INTRO_OUT = 2.25;
 
-      // ── Beat grid: chapter chip windows (seconds) ──
-      // Tiempos medidos sobre el material (contact sheet con timecode):
-      //   0.0–3.2  "¡ENTREGA EXPRESS A DOMICILIO!"
+      // Ventanas de los capítulos, medidas sobre el material (contact sheet
+      // con timecode generado en la nube):
+      //   0.0–3.2  "¡ENTREGA EXPRESS A DOMICILIO!"   -> la cubre el intro
       //   3.3–7.3  "CARRITO LISTO PARA TRABAJAR"
       //   7.4–11.3 "CLIENTE SATISFECHO = COBRO EN MANO"
       //  11.4–16.1 "COTIZA TU CARRITO A MEDIDA" + WhatsApp
       //  16.2–18.5 plano final del carrito (sin cartel)
       const BEATS = [
-        { in: 0.55, out: 3.15 },
         { in: 3.35, out: 7.25 },
         { in: 7.45, out: 11.2 },
         { in: 11.4, out: 16.05 },
@@ -551,7 +766,7 @@
 
       const tl = gsap.timeline({ paused: true });
 
-      // ── Reframe: slow continuous push + drift across the whole clip ──
+      // ── reframe sutil del footage ──
       tl.fromTo(
         ".stage",
         { scale: 1.03, xPercent: 0, yPercent: 0 },
@@ -559,131 +774,110 @@
         0,
       );
 
-      // ── Corner brackets draw in ──
+      // ══════════ INTRO ══════════
       tl.fromTo(
-        ".corner",
-        { scale: 0.55, autoAlpha: 0 },
-        { scale: 1, autoAlpha: 1, duration: 0.75, ease: "expo.out", stagger: 0.06 },
-        0.15,
+        "#w1",
+        { autoAlpha: 0, scale: 1.16, filter: "blur(18px)" },
+        { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" },
+        0.06,
       );
-      // HUD breathes gently for the rest of the clip
-      tl.to(
-        ".corner",
-        { autoAlpha: 0.72, duration: 1.6, repeat: 5, yoyo: true, ease: "sine.inOut" },
-        2.2,
+      tl.fromTo("#w1", { letterSpacing: "4px" }, { letterSpacing: "26px", duration: 1.0, ease: "power3.out" }, 0.06);
+
+      tl.fromTo(
+        "#w2",
+        { autoAlpha: 0, scale: 0.72, rotate: -2.4 },
+        { autoAlpha: 1, scale: 1, rotate: 0, duration: 0.7, ease: "back.out(1.7)" },
+        0.52,
+      );
+      tl.to("#w2", { scale: 1.03, duration: 0.5, ease: "sine.inOut" }, 1.3);
+
+      tl.fromTo(".intro-kicker", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.78);
+
+      tl.fromTo("#conn", { height: 0 }, { height: 84, duration: 0.45, ease: "power2.out" }, 0.95);
+      tl.fromTo("#conn-dot", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 1.28);
+
+      tl.fromTo(
+        ".panel",
+        { autoAlpha: 0, y: 54, scale: 0.9, rotate: 1.6 },
+        { autoAlpha: 1, y: 0, scale: 1, rotate: 0, duration: 0.66, ease: "expo.out", stagger: 0.13 },
+        1.05,
+      );
+      tl.fromTo(
+        ".panel .sheen",
+        { x: 0, opacity: 0 },
+        { x: 320, opacity: 1, duration: 0.6, ease: "power2.inOut", stagger: 0.06 },
+        1.4,
       );
 
-      // ── Brand lockup: blur-in + slide, then a light sheen ──
+      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 1.44);
+      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 2.0);
+
+      // salida del intro: el fondo carmesí se retira hacia arriba y revela el video
+      tl.to(".intro-inner", { y: -70, autoAlpha: 0, duration: 0.5, ease: "power2.in" }, 1.72);
+      tl.to(".panels", { autoAlpha: 0, y: 40, duration: 0.45, ease: "power2.in" }, 1.72);
+      tl.fromTo(".intro-bg", { clipPath: "inset(0 0 0% 0)" }, { clipPath: "inset(0 0 100% 0)", duration: 0.5, ease: "power3.inOut" }, 1.72);
+
+      // ══════════ HUD ══════════
+      tl.fromTo(
+        ".corner",
+        { scale: 0.6, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, duration: 0.7, ease: "expo.out", stagger: 0.06 },
+        INTRO_OUT + 0.1,
+      );
+      tl.to(".corner", { autoAlpha: 0.68, duration: 1.7, repeat: 5, yoyo: true, ease: "sine.inOut" }, INTRO_OUT + 2.2);
+
       tl.fromTo(
         ".brand",
-        { x: -70, autoAlpha: 0, filter: "blur(14px)" },
-        { x: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.85, ease: "expo.out" },
-        0.35,
+        { x: -64, autoAlpha: 0, filter: "blur(14px)" },
+        { x: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" },
+        2.4,
       );
-      tl.fromTo(
-        ".brand-sheen",
-        { x: 0, opacity: 0 },
-        { x: 340, opacity: 1, duration: 0.7, ease: "power2.inOut" },
-        0.85,
-      );
-      tl.to(".brand-sheen", { opacity: 0, duration: 0.2 }, 1.5);
+      tl.fromTo(".brand-sheen", { x: 0, opacity: 0 }, { x: 320, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 2.9);
+      tl.to(".brand-sheen", { opacity: 0, duration: 0.2 }, 3.55);
+      tl.to(".dot", { scale: 1.16, duration: 1.1, repeat: 5, yoyo: true, ease: "sine.inOut" }, 3.6);
+      tl.to(".brand", { autoAlpha: 0, x: -40, duration: 0.45, ease: "power2.in" }, 16.25);
 
-      // Brand dot heartbeat
-      tl.to(".dot", { scale: 1.14, duration: 1.15, repeat: 5, yoyo: true, ease: "sine.inOut" }, 2.0);
-
-      // ── Chapter chips: roll in / out per beat, with a light sweep on entry ──
-      const chips = gsap.utils.toArray("#chapter .chip");
-      BEATS.forEach(function (b, i) {
-        const chip = chips[i];
-        if (!chip) return;
+      // ── capítulos ──
+      gsap.utils.toArray("#chapter .chip").forEach(function (chip, i) {
+        const b = BEATS[i];
+        if (!b) return;
         const num = chip.querySelector(".chip-num");
         const rule = chip.querySelector(".chip-rule");
         const label = chip.querySelector(".chip-label");
         const tag = chip.querySelector(".chip-tag");
 
-        // entry
         tl.set(chip, { autoAlpha: 1 }, b.in);
-        tl.fromTo(
-          chip,
-          { x: 60, autoAlpha: 0 },
-          { x: 0, autoAlpha: 1, duration: 0.5, ease: "expo.out" },
-          b.in,
-        );
+        tl.fromTo(chip, { x: 56, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.5, ease: "expo.out" }, b.in);
         tl.fromTo(rule, { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power3.out" }, b.in + 0.1);
-        tl.fromTo(
-          num,
-          { autoAlpha: 0, y: -26, scale: 0.7 },
-          { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.8)" },
-          b.in + 0.06,
-        );
-        tl.fromTo(
-          label,
-          { autoAlpha: 0, x: 30 },
-          { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" },
-          b.in + 0.16,
-        );
-        tl.fromTo(
-          tag,
-          { autoAlpha: 0, x: 30 },
-          { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" },
-          b.in + 0.24,
-        );
+        tl.fromTo(num, { autoAlpha: 0, y: -24, scale: 0.7 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.8)" }, b.in + 0.06);
+        tl.fromTo(label, { autoAlpha: 0, x: 28 }, { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" }, b.in + 0.16);
+        tl.fromTo(tag, { autoAlpha: 0, x: 28 }, { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" }, b.in + 0.24);
 
-        // exit — every chip hands over to the next (and the last one clears
-        // the canvas for the closing product shot)
-        tl.to(chip, { autoAlpha: 0, x: -34, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
+        tl.to(chip, { autoAlpha: 0, x: -32, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
         tl.set(chip, { autoAlpha: 0 }, b.out);
 
-        // light sweep accent on every beat after the first
-        if (i > 0) {
-          tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.62, ease: "power2.inOut" }, b.in - 0.14);
-          tl.to("#sweep", { opacity: 0, duration: 0.18 }, b.in + 0.48);
-        }
+        // barrido de luz en cada cambio de beat
+        tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.6, ease: "power2.inOut" }, b.in - 0.14);
+        tl.to("#sweep", { opacity: 0, duration: 0.18 }, b.in + 0.46);
       });
 
-      // ── Floating sparks ──
-      gsap.utils.toArray("#sparks .spark").forEach(function (s, i) {
-        const t = 0.8 + i * 1.7;
-        tl.fromTo(
-          s,
-          { autoAlpha: 0, y: 40, scale: 0.4 },
-          { autoAlpha: 0.85, y: 0, scale: 1, duration: 1.1, ease: "power2.out" },
-          t,
-        );
-        if (t + 1.6 < DUR) {
-          tl.to(s, { autoAlpha: 0, y: -60, duration: 1.4, ease: "power2.in" }, t + 1.6);
-        }
-      });
+      // ── CTA ──
+      tl.fromTo(".pill", { y: 66, scale: 0.92, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 0.85, ease: "expo.out" }, 11.4);
+      tl.fromTo(".pill-sheen", { x: 0, opacity: 0 }, { x: 440, opacity: 1, duration: 0.75, ease: "power2.inOut" }, 11.95);
+      tl.to(".pill-sheen", { opacity: 0, duration: 0.2 }, 12.7);
+      tl.fromTo(".cta-sub", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" }, 12.05);
+      tl.to(".pill", { scale: 1.035, duration: 0.9, repeat: 2, yoyo: true, ease: "sine.inOut" }, 13.2);
+      tl.to("#cta", { autoAlpha: 0, y: 30, duration: 0.45, ease: "power2.in" }, 16.15);
 
-      // ── Bottom CTA: pop in with sheen, then a heartbeat ──
-      tl.fromTo(
-        ".pill",
-        { y: 70, scale: 0.92, autoAlpha: 0 },
-        { y: 0, scale: 1, autoAlpha: 1, duration: 0.85, ease: "expo.out" },
-        11.4,
-      );
-      tl.fromTo(
-        ".pill-sheen",
-        { x: 0, opacity: 0 },
-        { x: 460, opacity: 1, duration: 0.75, ease: "power2.inOut" },
-        11.9,
-      );
-      tl.to(".pill-sheen", { opacity: 0, duration: 0.2 }, 12.65);
-      tl.fromTo(
-        ".cta-sub",
-        { autoAlpha: 0, y: 26 },
-        { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" },
-        12.0,
-      );
-      tl.to(".pill", { scale: 1.035, duration: 0.9, repeat: 3, yoyo: true, ease: "sine.inOut" }, 13.2);
+      // ══════════ OUTRO ══════════
+      tl.fromTo("#outro-w1", { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "expo.out" }, 16.85);
+      tl.fromTo("#outro-w2", { autoAlpha: 0, y: 40, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.5)" }, 16.98);
+      tl.fromTo("#outro-rule", { width: 0 }, { width: 300, duration: 0.55, ease: "power3.out" }, 17.2);
+      tl.fromTo(".outro-phone", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 17.35);
+      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.75, ease: "power2.inOut" }, 17.05);
+      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 17.75);
 
-      // ── End flourish: light sweep on the closing product shot, rule + CTA lift ──
-      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 16.25);
-      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 16.85);
-      tl.to(".pill", { scale: 1.05, duration: 0.6, ease: "back.out(1.6)" }, 16.4);
-      tl.to(".pill", { y: -14, duration: 0.7, ease: "power2.out" }, DUR - 0.9);
-
-      // ── Progress rail ──
+      // ── riel de progreso ──
       tl.fromTo(".bar", { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: "none" }, 0);
 
       window.__timelines["main"] = tl;
