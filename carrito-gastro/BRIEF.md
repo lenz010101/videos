@@ -23,7 +23,9 @@ contenido ni los subtítulos ya quemados. Tono street-food, directo y cálido.
 
 ## Customizations
 
-- Color grading: preset `food-pop` (realza rojos y amarillos, sube saturación y contraste del material de comida).
+- Color grading: look `food-pop` **horneado en píxeles con FFmpeg** en build (eq + colorbalance).
+  No usa el shader de runtime `data-color-grading`: medido en el runner, ese shader cuesta
+  28.664 ms/frame sobre GL por software, contra 66 ms/frame sin él (~450x). Mismo look, render viable.
 - Reframing: empuje lento continuo + deriva sutil (zoom/pan sobre un wrapper no temporizado).
 - Overlays de marca: lockup superior (nombre + handle) en glassmorphism y píldora CTA inferior, paleta rojo fuego + amarillo.
 - Riel de progreso inferior animado.

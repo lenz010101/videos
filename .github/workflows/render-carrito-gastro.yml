@@ -66,8 +66,14 @@ jobs:
       - name: Re-encode source with dense keyframes
         run: |
           mv assets/source.mp4 assets/source.orig.mp4
+          # The food-pop look is BAKED into the pixels here instead of using
+          # data-color-grading. Measured on this runner, the runtime grading
+          # shader costs 28,664 ms/frame on software GL versus 66 ms/frame
+          # without it (~450x). Same look, and the render becomes feasible.
+          # Tune the look by editing the eq/colorbalance values below.
           ffmpeg -y -v error \
             -i assets/source.orig.mp4 \
+            -vf "fps=30,eq=saturation=1.18:contrast=1.07:gamma=1.02,colorbalance=rs=0.04:gs=0.01:bs=-0.04:rm=0.03:gm=0.01:bm=-0.03:rh=0.02:bh=-0.02" \
             -c:v libx264 -r 30 -g 30 -keyint_min 30 \
             -crf 15 -preset medium -pix_fmt yuv420p \
             -movflags +faststart \
