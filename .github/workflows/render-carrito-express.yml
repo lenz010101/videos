@@ -223,3 +223,21 @@ jobs:
           path: carrito-express/renders/carrito-express.mp4
           if-no-files-found: error
           retention-days: 14
+
+      # QA visual en la nube: frames puntuales del MP4 renderizado para revisar
+      # lockup, chapters, sweeps y CTA sin tocar la máquina local.
+      - name: Extract QA frames
+        run: |
+          mkdir -p qa
+          for t in 0.9 2.5 5.0 7.5 9.8 12.0 14.5 17.0; do
+            ffmpeg -y -v error -ss "$t" -i renders/carrito-express.mp4 -frames:v 1 "qa/frame-${t}s.png"
+          done
+          ls -la qa/
+
+      - name: Upload QA frames
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrito-express-qa-frames
+          path: carrito-express/qa/*.png
+          if-no-files-found: error
+          retention-days: 7
