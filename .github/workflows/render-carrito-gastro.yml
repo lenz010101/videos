@@ -91,17 +91,27 @@ jobs:
 
       # Read the CLI's own summary line:
       #   beginframe|screenshot capture · gpu · compile Xs · setup Xs · capture Xs · encode Xs
-      # --workers: measured in an A/B on this runner (same source, same settings,
-      # one job per configuration, separate VMs):
-      #   auto(1)=108s   workers=2=61s   workers=4=65s
-      # Two workers is the sweet spot: the capture loop halves, and 4 workers on
-      # a 4-core runner starts contending and loses the gain back.
+      # --workers: left at auto, on purpose. An A/B on this runner showed
+      # workers=2 (61s) beating auto (108s) -- but that A/B ran at
+      # --quality draft, where the encoder is fast and the capture loop is the
+      # bottleneck. At the production setting (--quality looks, CRF 16) the
+      # bottleneck flips: the log's own summary reads
+      #   capture 3m 11.2s · encode (during capture) 3m 11.2s
+      # i.e. the capture loop and the streaming encoder are locked to the same
+      # wall time, and frame throughput is 113 ms/frame with 2 workers versus
+      # 115 ms/frame with 1. Extra capture workers just queue behind the encoder.
+      #
+      # The real lever on render time is the encoder, not the workers:
+      #   --quality looks (CRF 16, standard preset) -> capture+encode 191s
+      #   --quality draft                           -> ~108s
+      # or pin --crf / --video-bitrate directly. The source is 478x850 upscaled
+      # to 1080x1920, so CRF 16's 14.5 Mbps carries far more than this material
+      # actually holds.
       - name: Render MP4
         run: |
           npx --yes hyperframes@0.8.156 render \
             --fps 30 \
             --quality looks \
-            --workers 2 \
             --browser-timeout 300 \
             -o renders/carrito-gastro.mp4
 
