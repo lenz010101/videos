@@ -21,7 +21,7 @@ on:
       mode:
         description: "Qué ejecutar"
         type: choice
-        options: [all, transcribe, render]
+        options: [all, analyze, transcribe, render]
         default: all
         required: false
       model:
@@ -51,10 +51,58 @@ env:
 
 jobs:
   # ─────────────────────────────────────────────────────────────
+  # 0) Análisis en la nube: ¿cuándo cambia cada cartel quemado?
+  #    Genera contact sheets con timecode + perfil de audio.
+  # ─────────────────────────────────────────────────────────────
+  analyze:
+    if: ${{ contains(fromJSON('["all","analyze"]'), github.event.inputs.mode || 'all') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: carrito-express
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install FFmpeg + fonts
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Contact sheet (full frame, 2 fps, timestamped)
+        run: |
+          mkdir -p qa
+          ffmpeg -y -v error -i assets/source.mp4 \
+            -vf "fps=2,scale=200:-1,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{pts\:hms}':x=4:y=4:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.65:boxborderw=4,tile=5x8" \
+            -frames:v 1 qa/sheet-full.png
+          ls -la qa/
+
+      - name: Contact sheet (caption band, legible)
+        run: |
+          ffmpeg -y -v error -i assets/source.mp4 \
+            -vf "fps=2,crop=iw:ih*0.34:0:ih*0.36,scale=420:-1,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{pts\:hms}':x=4:y=4:fontsize=22:fontcolor=yellow:box=1:boxcolor=black@0.7:boxborderw=4,tile=4x10" \
+            -frames:v 1 qa/sheet-caption.png
+          ls -la qa/
+
+      - name: Audio energy profile
+        run: |
+          ffmpeg -hide_banner -v info -i assets/source.mp4 \
+            -af "astats=metadata=1:reset=12,ametadata=print:key=lavfi.astats.Overall.RMS_level:file=-" \
+            -f null - 2>/dev/null | head -n 400 > qa/audio-rms.txt || true
+          wc -l qa/audio-rms.txt
+
+      - name: Upload analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrito-express-analysis
+          path: carrito-express/qa/*
+          if-no-files-found: error
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────
   # 1) Transcripción en la nube (faster-whisper, word-level)
   # ─────────────────────────────────────────────────────────────
   transcribe:
-    if: ${{ (github.event.inputs.mode || 'all') != 'render' }}
+    if: ${{ contains(fromJSON('["all","transcribe"]'), github.event.inputs.mode || 'all') }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -130,7 +178,7 @@ jobs:
   # 2) Render en la nube (headless Chrome + ffmpeg)
   # ─────────────────────────────────────────────────────────────
   render:
-    if: ${{ (github.event.inputs.mode || 'all') != 'transcribe' }}
+    if: ${{ contains(fromJSON('["all","render"]'), github.event.inputs.mode || 'all') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     defaults:
