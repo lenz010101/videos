@@ -33,7 +33,6 @@
         --fire-deep: #b4240f;
         --amber: #ffc531;
         --cream: #fff6e6;
-        --ink: #160d08;
       }
 
       * {
@@ -79,16 +78,16 @@
         align-items: center;
         gap: 20px;
         padding: 18px 32px;
-        background: rgba(22, 13, 8, 0.5);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 197, 49, 0.35);
+        background: rgba(15, 9, 5, 0.62);
+        border: 1px solid rgba(255, 197, 49, 0.38);
         border-radius: 26px;
         box-shadow:
           0 26px 60px rgba(0, 0, 0, 0.45),
           inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
 
-      .brand .dot {
+      .dot {
+        display: block;
         width: 52px;
         height: 52px;
         border-radius: 16px;
@@ -97,12 +96,12 @@
         flex: none;
       }
 
-      .brand .txt {
+      .txt {
         display: flex;
         flex-direction: column;
       }
 
-      .brand .name {
+      .name {
         font-family: "Anton", sans-serif;
         font-size: 44px;
         line-height: 1;
@@ -111,7 +110,7 @@
         text-transform: uppercase;
       }
 
-      .brand .handle {
+      .handle {
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 20px;
@@ -131,7 +130,7 @@
         justify-content: center;
       }
 
-      .cta .pill {
+      .pill {
         display: flex;
         align-items: center;
         gap: 18px;
@@ -143,7 +142,7 @@
           inset 0 1px 0 rgba(255, 255, 255, 0.25);
       }
 
-      .cta .pill .k {
+      .k {
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 24px;
@@ -152,7 +151,7 @@
         text-transform: uppercase;
       }
 
-      .cta .pill .v {
+      .v {
         font-family: "Anton", sans-serif;
         font-size: 38px;
         letter-spacing: 1px;
@@ -171,6 +170,7 @@
       }
 
       .progress .bar {
+        display: block;
         width: 100%;
         height: 100%;
         transform-origin: left center;
@@ -202,27 +202,25 @@
       </div>
 
       <div id="brand" class="clip" data-start="0.5" data-duration="54.9">
-        <div class="brand">
-          <div class="dot"></div>
-          <div class="txt">
+        <span class="brand">
+          <span class="dot"></span>
+          <span class="txt">
             <span class="name">Tu Marca</span>
             <span class="handle">@tumarca · carrito gastronómico</span>
-          </div>
-        </div>
+          </span>
+        </span>
       </div>
 
       <div id="cta" class="clip" data-start="3.4" data-duration="52">
-        <div class="cta">
-          <div class="pill">
+        <span class="cta">
+          <span class="pill">
             <span class="k">Pide por</span>
             <span class="v">WhatsApp</span>
-          </div>
-        </div>
+          </span>
+        </span>
       </div>
 
-      <div class="progress">
-        <div class="bar"></div>
-      </div>
+      <div class="progress"><span class="bar"></span></div>
     </div>
 
     <script>
@@ -256,7 +254,7 @@
 
       // CTA entrance.
       tl.fromTo(
-        ".cta .pill",
+        ".pill",
         { y: 46, scale: 0.94, autoAlpha: 0 },
         { y: 0, scale: 1, autoAlpha: 1, duration: 0.9, ease: "expo.out" },
         3.4,
@@ -264,18 +262,13 @@
 
       // Micro-interaction: brand dot breathes.
       tl.to(
-        ".brand .dot",
+        ".dot",
         { scale: 1.14, duration: 1.3, repeat: 3, yoyo: true, ease: "sine.inOut" },
         6,
       );
 
       // Progress rail.
-      tl.fromTo(
-        ".progress .bar",
-        { scaleX: 0 },
-        { scaleX: 1, duration: 55.4, ease: "none" },
-        0,
-      );
+      tl.fromTo(".bar", { scaleX: 0 }, { scaleX: 1, duration: 55.4, ease: "none" }, 0);
 
       window.__timelines["main"] = tl;
     </script>
