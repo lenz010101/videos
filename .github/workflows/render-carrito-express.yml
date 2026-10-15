@@ -79,7 +79,7 @@ jobs:
           key: hf-${{ runner.os }}-fasterwhisper-${{ github.event.inputs.model || 'small' }}
 
       - name: Install faster-whisper
-        run: pip install --no-input "faster-whisper==1.0.3" "av==12.3.0"
+        run: pip install --no-input "faster-whisper==1.0.3" "av==12.3.0" requests
 
       - name: Transcribe (word-level)
         run: |
