@@ -1,0 +1,63 @@
+name: AB — workers (auto vs 4)
+
+# The render resolved to workerCount: 1 by itself. Question: does forcing more
+# Chrome workers actually cut the capture time on a 4-core runner, or does it
+# thrash? Same composition, same baked source, two jobs in parallel.
+# Compare the p95Ms from each job's capture calibration and the total seconds.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ab-workers.yml'
+
+jobs:
+  ab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        workers: ["auto", "2", "4"]
+    defaults:
+      run:
+        working-directory: carrito-gastro
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/hfs
+          key: hfs-${{ runner.os }}-chrome-headless-shell-stable
+
+      - name: Install chrome-headless-shell
+        run: |
+          BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell 2>/dev/null | head -n 1)
+          if [ -z "$BIN" ]; then
+            npx --yes @puppeteer/browsers install chrome-headless-shell@stable --path "$HOME/.cache/hfs"
+            BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell | head -n 1)
+          fi
+          echo "HYPERFRAMES_BROWSER_PATH=$BIN" >> "$GITHUB_ENV"
+
+      - name: Bake source (grade + dense keyframes)
+        run: |
+          mv assets/source.mp4 assets/source.orig.mp4
+          ffmpeg -y -v error -i assets/source.orig.mp4 \
+            -vf "fps=30,eq=saturation=1.18:contrast=1.07:gamma=1.02,colorbalance=rs=0.04:gs=0.01:bs=-0.04:rm=0.03:gm=0.01:bm=-0.03:rh=0.02:bh=-0.02" \
+            -c:v libx264 -r 30 -g 30 -keyint_min 30 -crf 15 -preset medium -pix_fmt yuv420p \
+            -movflags +faststart -c:a copy assets/source.mp4
+
+      - name: Render workers=${{ matrix.workers }}
+        run: |
+          START=$(date +%s)
+          npx --yes hyperframes@0.8.156 render \
+            --fps 30 --quality draft \
+            --workers ${{ matrix.workers }} \
+            -o renders/ab-workers-${{ matrix.workers }}.mp4
+          echo "RESULT_WORKERS=${{ matrix.workers }} TOTAL_SECONDS=$(( $(date +%s) - START ))"
