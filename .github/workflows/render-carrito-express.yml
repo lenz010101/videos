@@ -34,6 +34,16 @@ on:
         description: "Idioma hablado"
         default: "es"
         required: false
+      quality:
+        description: "Calidad de render (draft = iterar rápido, looks = entrega)"
+        type: choice
+        options: [draft, looks, delivery]
+        default: looks
+        required: false
+      crf:
+        description: "CRF del encoder (más alto = más rápido y más liviano)"
+        default: "20"
+        required: false
 
 concurrency:
   group: carrito-express
@@ -260,7 +270,8 @@ jobs:
         run: |
           npx --yes hyperframes@${{ env.HYPERFRAMES_VERSION }} render \
             --fps 30 \
-            --quality looks \
+            --quality ${{ github.event.inputs.quality || 'looks' }} \
+            --crf ${{ github.event.inputs.crf || '20' }} \
             --browser-timeout 300 \
             -o renders/carrito-express.mp4
 
