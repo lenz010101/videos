@@ -272,13 +272,12 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      # QA visual en la nube: frames puntuales del MP4 renderizado para revisar
-      # lockup, chapters, sweeps y CTA sin tocar la máquina local.
+      # QA visual en la nube (frames livianos a 540px: descarga rápida).
       - name: Extract QA frames
         run: |
           mkdir -p qa
-          for t in 0.6 1.3 1.9 2.6 4.2 9.2 12.2 14.8 17.4; do
-            ffmpeg -y -v error -ss "$t" -i renders/carrito-express.mp4 -frames:v 1 "qa/frame-${t}s.png"
+          for t in 1.3 1.9 4.2 9.2 12.2 17.4; do
+            ffmpeg -y -v error -ss "$t" -i renders/carrito-express.mp4 -vf "scale=540:-1" -frames:v 1 "qa/frame-${t}s.png"
           done
           ls -la qa/
 
