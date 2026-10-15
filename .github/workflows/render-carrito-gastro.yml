@@ -10,6 +10,7 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: carrito-gastro
@@ -21,23 +22,76 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: carrito-gastro/package.json
+
+      # Runs after the first skip the browser download.
+      - name: Cache chrome-headless-shell
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/hfs
+          key: hfs-${{ runner.os }}-chrome-headless-shell-stable
 
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install chrome-headless-shell
         run: |
-          npx --yes @puppeteer/browsers install chrome-headless-shell@stable --path "$HOME/.cache/hfs"
-          BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell | head -n 1)
+          BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell 2>/dev/null | head -n 1)
+          if [ -z "$BIN" ]; then
+            npx --yes @puppeteer/browsers install chrome-headless-shell@stable --path "$HOME/.cache/hfs"
+            BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell | head -n 1)
+          fi
           echo "Using browser: $BIN"
           echo "HYPERFRAMES_BROWSER_PATH=$BIN" >> "$GITHUB_ENV"
+
+      # The source is a phone capture whose keyframes sit ~5s apart. Every capture
+      # seek then has to re-decode up to 5s of video, which stalls the frame loop.
+      # Report the real numbers before touching anything.
+      - name: Probe source keyframes
+        run: |
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,avg_frame_rate,nb_frames,duration \
+            -of default=noprint_wrappers=1 assets/source.mp4
+          FRAMES=$(ffprobe -v error -select_streams v:0 -show_entries frame=key_frame \
+            -of csv=p=0 assets/source.mp4 | grep -c '')
+          KEYS=$(ffprobe -v error -select_streams v:0 -show_entries frame=key_frame \
+            -of csv=p=0 assets/source.mp4 | grep -c '^1')
+          echo "total_frames=$FRAMES keyframes=$KEYS"
+          [ "$KEYS" -gt 0 ] && echo "avg_gop_frames=$((FRAMES / KEYS))"
+
+      # Exactly the re-encode the HyperFrames compiler asks for, at CRF 15 so the
+      # extra generation costs no visible quality. Native resolution is kept, so
+      # decode stays cheap. Audio is copied bit-for-bit.
+      - name: Re-encode source with dense keyframes
+        run: |
+          mv assets/source.mp4 assets/source.orig.mp4
+          ffmpeg -y -v error \
+            -i assets/source.orig.mp4 \
+            -c:v libx264 -r 30 -g 30 -keyint_min 30 \
+            -crf 15 -preset medium -pix_fmt yuv420p \
+            -movflags +faststart \
+            -c:a copy \
+            assets/source.mp4
+          echo "--- optimized ---"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,avg_frame_rate,nb_frames,duration \
+            -of default=noprint_wrappers=1 assets/source.mp4
+          ls -la assets/
 
       - name: Validate composition
         continue-on-error: true
         run: npx --yes hyperframes@0.8.156 check
 
+      # Read the CLI's own summary line:
+      #   beginframe|screenshot capture · gpu · compile Xs · setup Xs · capture Xs · encode Xs
       - name: Render MP4
-        run: npx --yes hyperframes@0.8.156 render --fps 30 --quality high -o renders/carrito-gastro.mp4
+        run: |
+          npx --yes hyperframes@0.8.156 render \
+            --fps 30 \
+            --quality looks \
+            --browser-timeout 300 \
+            -o renders/carrito-gastro.mp4
 
       - name: Upload rendered video
         uses: actions/upload-artifact@v4
