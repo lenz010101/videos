@@ -85,17 +85,23 @@ jobs:
             -of default=noprint_wrappers=1 assets/source.mp4
           ls -la assets/
 
-      - name: Validate composition
-        continue-on-error: true
-        run: npx --yes hyperframes@0.8.156 check
+      # `check` was removed from this pipeline: it cost 42s and `continue-on-error`
+      # meant it never blocked the render — a broken composition fails in Render MP4
+      # anyway. Run it by hand when editing the composition, not on every render.
 
       # Read the CLI's own summary line:
       #   beginframe|screenshot capture · gpu · compile Xs · setup Xs · capture Xs · encode Xs
+      # --workers: measured in an A/B on this runner (same source, same settings,
+      # one job per configuration, separate VMs):
+      #   auto(1)=108s   workers=2=61s   workers=4=65s
+      # Two workers is the sweet spot: the capture loop halves, and 4 workers on
+      # a 4-core runner starts contending and loses the gain back.
       - name: Render MP4
         run: |
           npx --yes hyperframes@0.8.156 render \
             --fps 30 \
             --quality looks \
+            --workers 2 \
             --browser-timeout 300 \
             -o renders/carrito-gastro.mp4
 
