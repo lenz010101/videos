@@ -57,7 +57,6 @@
         --white: #ffffff;
         --cream: #f6ece6;
         --stroke: rgba(255, 255, 255, 0.86);
-        --hair: rgba(255, 255, 255, 0.3);
       }
 
       * {
@@ -162,10 +161,12 @@
         position: absolute;
         inset: 0;
         overflow: hidden;
+        display: block;
       }
       .intro-bg {
         position: absolute;
         inset: 0;
+        display: block;
         background:
           radial-gradient(90% 62% at 50% 34%, var(--crimson-2) 0%, var(--crimson-1) 46%, var(--crimson-0) 100%),
           linear-gradient(180deg, #1d0205 0%, #5d0c13 52%, #120102 100%);
@@ -186,15 +187,23 @@
         align-items: center;
       }
       #w1 {
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: 24px;
         font-size: 148px;
-        letter-spacing: 8px;
+      }
+      #w1 .ch {
+        display: block;
       }
       #w2 {
+        display: block;
         font-size: 100px;
         letter-spacing: 7px;
         margin-top: 26px;
       }
       .intro-kicker {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 21px;
@@ -203,20 +212,21 @@
         text-transform: uppercase;
         margin-top: 40px;
       }
-      .conn {
+      #conn {
+        display: block;
         width: 2px;
         height: 0;
         margin: 30px auto 0;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 43, 43, 0.7));
         box-shadow: 0 0 18px rgba(255, 43, 43, 0.7);
       }
-      .conn-dot {
+      #conn-dot {
+        display: block;
         width: 10px;
         height: 10px;
         border-radius: 50%;
         background: var(--red);
         box-shadow: 0 0 20px rgba(255, 43, 43, 0.95);
-        margin: 0 auto;
         opacity: 0;
       }
 
@@ -250,10 +260,12 @@
         opacity: 0;
       }
       .panel .script {
+        display: block;
         font-size: 44px;
         margin-bottom: 8px;
       }
       .panel .tag {
+        display: block;
         font-family: "Anton", sans-serif;
         font-size: 34px;
         letter-spacing: 1.5px;
@@ -262,6 +274,7 @@
         line-height: 1.02;
       }
       .panel .rule {
+        display: block;
         width: 46px;
         height: 2px;
         background: var(--red);
@@ -363,6 +376,7 @@
         flex: none;
       }
       .brand .name {
+        display: block;
         font-family: "Anton", sans-serif;
         font-size: 38px;
         line-height: 1;
@@ -371,6 +385,7 @@
         text-transform: uppercase;
       }
       .brand .handle {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 17px;
@@ -391,6 +406,7 @@
         right: 78px;
         width: 372px;
         height: 124px;
+        display: block;
       }
       .chip {
         position: absolute;
@@ -411,6 +427,7 @@
         overflow: hidden;
       }
       .chip-num {
+        display: block;
         font-family: "Anton", sans-serif;
         font-size: 58px;
         line-height: 1;
@@ -418,6 +435,7 @@
         -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.9);
       }
       .chip-rule {
+        display: block;
         width: 2px;
         height: 58px;
         background: linear-gradient(180deg, var(--red), rgba(255, 43, 43, 0.2));
@@ -431,6 +449,7 @@
         text-align: right;
       }
       .chip-label {
+        display: block;
         font-family: "Anton", sans-serif;
         font-size: 30px;
         line-height: 1.04;
@@ -439,6 +458,7 @@
         text-transform: uppercase;
       }
       .chip-tag {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 15px;
@@ -490,24 +510,24 @@
         opacity: 0;
       }
       .wa {
+        display: block;
         width: 54px;
         height: 54px;
         border-radius: 50%;
-        background: #25d366;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background-color: #25d366;
+        background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20fill='%230a0603'%20d='M12.04%202C6.58%202%202.13%206.45%202.13%2011.91c0%201.75.46%203.45%201.32%204.95L2%2022l5.25-1.38a9.9%209.9%200%200%200%204.79%201.22h.01c5.46%200%209.91-4.45%209.91-9.91C21.96%206.45%2017.5%202%2012.04%202Zm5.8%2014.16c-.24.68-1.42%201.31-1.96%201.35-.54.05-1.05.24-3.53-.73-2.98-1.17-4.85-4.25-5-4.45-.14-.2-1.17-1.56-1.17-2.97%200-1.41.73-2.1%201-2.39.26-.29.58-.36.77-.36l.55.01c.18.01.42-.07.65.5.24.58.82%202%20.89%202.14.07.15.12.32.02.51-.09.2-.14.32-.29.49l-.43.5c-.14.14-.29.3-.12.59.17.29.75%201.24%201.61%202.01%201.11.99%202.04%201.3%202.33%201.44.29.15.46.12.63-.07.17-.2.73-.85.92-1.15.2-.29.39-.24.65-.15.26.1%201.68.79%201.97.94.29.14.48.22.55.34.07.12.07.7-.17%201.38Z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 32px 32px;
         flex: none;
         box-shadow: 0 0 22px rgba(37, 211, 102, 0.55);
-      }
-      .wa svg {
-        display: block;
       }
       .pill-body {
         display: flex;
         flex-direction: column;
       }
       .pill-k {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 19px;
@@ -516,6 +536,7 @@
         text-transform: uppercase;
       }
       .pill-v {
+        display: block;
         font-family: "Anton", sans-serif;
         font-size: 44px;
         line-height: 1.05;
@@ -523,6 +544,7 @@
         color: var(--white);
       }
       .cta-sub {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 17px;
@@ -539,10 +561,12 @@
         bottom: 0;
         height: 700px;
         overflow: hidden;
+        display: block;
       }
       .outro-band {
         position: absolute;
         inset: 0;
+        display: block;
         background: linear-gradient(180deg, rgba(23, 1, 3, 0) 0%, rgba(74, 10, 16, 0.94) 34%, #120102 100%);
         border-top: 1.5px solid rgba(255, 255, 255, 0.24);
       }
@@ -556,15 +580,18 @@
         align-items: center;
       }
       #outro-w1 {
+        display: block;
         font-size: 108px;
         letter-spacing: 6px;
       }
       #outro-w2 {
+        display: block;
         font-size: 74px;
         letter-spacing: 5px;
         margin-top: 16px;
       }
-      .outro-rule {
+      #outro-rule {
+        display: block;
         width: 0;
         height: 2px;
         margin-top: 34px;
@@ -572,6 +599,7 @@
         box-shadow: 0 0 16px rgba(255, 43, 43, 0.9);
       }
       .outro-phone {
+        display: block;
         font-family: "Inter", sans-serif;
         font-weight: 700;
         font-size: 22px;
@@ -625,40 +653,44 @@
       <div class="grade"></div>
       <div class="scrim-b"></div>
 
-      <div class="sweep" id="sweep"></div>
+      <span class="sweep" id="sweep"></span>
 
       <!-- ===== intro title sting ===== -->
       <div id="intro" class="clip" data-start="0" data-duration="2.25">
-        <div class="intro">
-          <div class="intro-bg"></div>
-          <div class="intro-inner">
-            <div id="w1" class="outline">Carrito</div>
-            <div id="w2" class="solid">Gastronómico</div>
-            <div class="intro-kicker">Hecho a medida</div>
-            <div class="conn" id="conn"></div>
-            <div class="conn-dot" id="conn-dot"></div>
-          </div>
-          <div class="panels">
-            <div class="panel">
+        <span class="intro">
+          <span class="intro-bg"></span>
+          <span class="intro-inner">
+            <span
+              id="w1"
+              class="outline"
+              ><span class="ch">C</span><span class="ch">A</span><span class="ch">R</span><span class="ch">R</span><span class="ch">I</span><span class="ch">T</span><span class="ch">O</span></span
+            >
+            <span id="w2" class="solid">Gastronómico</span>
+            <span class="intro-kicker">Hecho a medida</span>
+            <span id="conn"></span>
+            <span id="conn-dot"></span>
+          </span>
+          <span class="panels">
+            <span class="panel">
               <span class="sheen"></span>
               <span class="script">hecho</span>
               <span class="tag">A medida</span>
               <span class="rule"></span>
-            </div>
-            <div class="panel">
+            </span>
+            <span class="panel">
               <span class="sheen"></span>
               <span class="script">entrega</span>
               <span class="tag">Express</span>
               <span class="rule"></span>
-            </div>
-            <div class="panel">
+            </span>
+            <span class="panel">
               <span class="sheen"></span>
               <span class="script">cotiza</span>
               <span class="tag">981 121<br />0541</span>
               <span class="rule"></span>
-            </div>
-          </div>
-        </div>
+            </span>
+          </span>
+        </span>
       </div>
 
       <!-- ===== HUD over the footage ===== -->
@@ -713,13 +745,7 @@
         <span class="cta">
           <span class="pill">
             <span class="pill-sheen"></span>
-            <span class="wa">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="#0a0603">
-                <path
-                  d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.54.05-1.05.24-3.53-.73-2.98-1.17-4.85-4.25-5-4.45-.14-.2-1.17-1.56-1.17-2.97 0-1.41.73-2.1 1-2.39.26-.29.58-.36.77-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.14.07.15.12.32.02.51-.09.2-.14.32-.29.49l-.43.5c-.14.14-.29.3-.12.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.33 1.44.29.15.46.12.63-.07.17-.2.73-.85.92-1.15.2-.29.39-.24.65-.15.26.1 1.68.79 1.97.94.29.14.48.22.55.34.07.12.07.7-.17 1.38Z"
-                />
-              </svg>
-            </span>
+            <span class="wa"></span>
             <span class="pill-body">
               <span class="pill-k">Cotiza por WhatsApp</span>
               <span class="pill-v">981 121 0541</span>
@@ -731,15 +757,15 @@
 
       <!-- ===== closing brand band ===== -->
       <div id="outro" class="clip" data-start="16.7" data-duration="1.8">
-        <div class="outro">
-          <div class="outro-band"></div>
-          <div class="outro-inner">
-            <div id="outro-w1" class="outline">Carrito</div>
-            <div id="outro-w2" class="solid">Gastronómico</div>
-            <div class="outro-rule" id="outro-rule"></div>
-            <div class="outro-phone">WhatsApp · 981 121 0541</div>
-          </div>
-        </div>
+        <span class="outro">
+          <span class="outro-band"></span>
+          <span class="outro-inner">
+            <span id="outro-w1" class="outline">Carrito</span>
+            <span id="outro-w2" class="solid">Gastronómico</span>
+            <span id="outro-rule"></span>
+            <span class="outro-phone">WhatsApp · 981 121 0541</span>
+          </span>
+        </span>
       </div>
 
       <div class="progress"><span class="bar"></span></div>
@@ -751,8 +777,8 @@
       const DUR = 18.5;
       const INTRO_OUT = 2.25;
 
-      // Ventanas de los capítulos, medidas sobre el material (contact sheet
-      // con timecode generado en la nube):
+      // Ventanas de los capítulos, medidas sobre el material (contact sheet con
+      // timecode generado en la nube):
       //   0.0–3.2  "¡ENTREGA EXPRESS A DOMICILIO!"   -> la cubre el intro
       //   3.3–7.3  "CARRITO LISTO PARA TRABAJAR"
       //   7.4–11.3 "CLIENTE SATISFECHO = COBRO EN MANO"
@@ -765,6 +791,25 @@
       ];
 
       const tl = gsap.timeline({ paused: true });
+
+      // Barrido de luz. El primer fromTo fija el estado de reposo (x:0); los
+      // siguientes usan immediateRender:false para no pisar ese baseline en los
+      // seeks anteriores a su posición.
+      function sweepAt(t, dur, first) {
+        tl.fromTo(
+          "#sweep",
+          { x: 0, opacity: 0 },
+          {
+            x: 2400,
+            opacity: 1,
+            duration: dur,
+            ease: "power2.inOut",
+            immediateRender: !!first,
+          },
+          t,
+        );
+        tl.to("#sweep", { opacity: 0, duration: 0.18, ease: "power2.in" }, t + dur + 0.01);
+      }
 
       // ── reframe sutil del footage ──
       tl.fromTo(
@@ -781,7 +826,19 @@
         { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" },
         0.06,
       );
-      tl.fromTo("#w1", { letterSpacing: "4px" }, { letterSpacing: "26px", duration: 1.0, ease: "power3.out" }, 0.06);
+
+      // Tracking-in real: cada glifo entra comprimido hacia el centro y se abre.
+      // (No se anima letterSpacing: reflowea el texto y tirita en el capturador.)
+      const chars = gsap.utils.toArray("#w1 .ch");
+      const mid = (chars.length - 1) / 2;
+      chars.forEach(function (el, i) {
+        tl.fromTo(
+          el,
+          { x: -(i - mid) * 22 },
+          { x: 0, duration: 0.9, ease: "power3.out" },
+          0.06,
+        );
+      });
 
       tl.fromTo(
         "#w2",
@@ -809,10 +866,9 @@
         1.4,
       );
 
-      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 1.44);
-      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 2.0);
+      sweepAt(1.44, 0.6, true);
 
-      // salida del intro: el fondo carmesí se retira hacia arriba y revela el video
+      // Salida del intro: el carmesí se retira hacia arriba y revela el video.
       tl.to(".intro-inner", { y: -70, autoAlpha: 0, duration: 0.5, ease: "power2.in" }, 1.72);
       tl.to(".panels", { autoAlpha: 0, y: 40, duration: 0.45, ease: "power2.in" }, 1.72);
       tl.fromTo(".intro-bg", { clipPath: "inset(0 0 0% 0)" }, { clipPath: "inset(0 0 100% 0)", duration: 0.5, ease: "power3.inOut" }, 1.72);
@@ -824,7 +880,7 @@
         { scale: 1, autoAlpha: 1, duration: 0.7, ease: "expo.out", stagger: 0.06 },
         INTRO_OUT + 0.1,
       );
-      tl.to(".corner", { autoAlpha: 0.68, duration: 1.7, repeat: 5, yoyo: true, ease: "sine.inOut" }, INTRO_OUT + 2.2);
+      tl.to(".corner", { autoAlpha: 0.68, duration: 1.7, repeat: 5, yoyo: true, ease: "sine.inOut" }, 4.45);
 
       tl.fromTo(
         ".brand",
@@ -833,7 +889,7 @@
         2.4,
       );
       tl.fromTo(".brand-sheen", { x: 0, opacity: 0 }, { x: 320, opacity: 1, duration: 0.7, ease: "power2.inOut" }, 2.9);
-      tl.to(".brand-sheen", { opacity: 0, duration: 0.2 }, 3.55);
+      tl.to(".brand-sheen", { opacity: 0, duration: 0.2 }, 3.62);
       tl.to(".dot", { scale: 1.16, duration: 1.1, repeat: 5, yoyo: true, ease: "sine.inOut" }, 3.6);
       tl.to(".brand", { autoAlpha: 0, x: -40, duration: 0.45, ease: "power2.in" }, 16.25);
 
@@ -846,7 +902,6 @@
         const label = chip.querySelector(".chip-label");
         const tag = chip.querySelector(".chip-tag");
 
-        tl.set(chip, { autoAlpha: 1 }, b.in);
         tl.fromTo(chip, { x: 56, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.5, ease: "expo.out" }, b.in);
         tl.fromTo(rule, { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power3.out" }, b.in + 0.1);
         tl.fromTo(num, { autoAlpha: 0, y: -24, scale: 0.7 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.8)" }, b.in + 0.06);
@@ -854,28 +909,24 @@
         tl.fromTo(tag, { autoAlpha: 0, x: 28 }, { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" }, b.in + 0.24);
 
         tl.to(chip, { autoAlpha: 0, x: -32, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
-        tl.set(chip, { autoAlpha: 0 }, b.out);
 
-        // barrido de luz en cada cambio de beat
-        tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.6, ease: "power2.inOut" }, b.in - 0.14);
-        tl.to("#sweep", { opacity: 0, duration: 0.18 }, b.in + 0.46);
+        sweepAt(b.in - 0.14, 0.6, false);
       });
 
       // ── CTA ──
       tl.fromTo(".pill", { y: 66, scale: 0.92, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 0.85, ease: "expo.out" }, 11.4);
       tl.fromTo(".pill-sheen", { x: 0, opacity: 0 }, { x: 440, opacity: 1, duration: 0.75, ease: "power2.inOut" }, 11.95);
-      tl.to(".pill-sheen", { opacity: 0, duration: 0.2 }, 12.7);
+      tl.to(".pill-sheen", { opacity: 0, duration: 0.2 }, 12.72);
       tl.fromTo(".cta-sub", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" }, 12.05);
       tl.to(".pill", { scale: 1.035, duration: 0.9, repeat: 2, yoyo: true, ease: "sine.inOut" }, 13.2);
-      tl.to("#cta", { autoAlpha: 0, y: 30, duration: 0.45, ease: "power2.in" }, 16.15);
+      tl.to(".cta", { autoAlpha: 0, y: 30, duration: 0.45, ease: "power2.in" }, 16.15);
 
       // ══════════ OUTRO ══════════
       tl.fromTo("#outro-w1", { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "expo.out" }, 16.85);
       tl.fromTo("#outro-w2", { autoAlpha: 0, y: 40, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6, ease: "back.out(1.5)" }, 16.98);
       tl.fromTo("#outro-rule", { width: 0 }, { width: 300, duration: 0.55, ease: "power3.out" }, 17.2);
       tl.fromTo(".outro-phone", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 17.35);
-      tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.75, ease: "power2.inOut" }, 17.05);
-      tl.to("#sweep", { opacity: 0, duration: 0.2 }, 17.75);
+      sweepAt(17.05, 0.75, false);
 
       // ── riel de progreso ──
       tl.fromTo(".bar", { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: "none" }, 0);
