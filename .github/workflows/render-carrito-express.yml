@@ -1,0 +1,225 @@
+name: Carrito Express (cloud · transcribe + render)
+
+# Nada se procesa en local: transcripción (faster-whisper) y render (headless
+# Chrome + ffmpeg) corren en runners de GitHub. Los dos jobs son independientes
+# y, con mode=all, se ejecutan EN PARALELO para minimizar el tiempo total.
+#
+#   mode=transcribe  -> sólo saca la transcripción y la commitea al repo
+#   mode=render      -> sólo renderiza el MP4
+#   mode=all         -> ambos, en paralelo
+#
+# Caché (lo que hace que a partir de la 2ª corrida sea mucho más rápido):
+#   - ~/.cache/pip          wheels de faster-whisper/av
+#   - ~/.cache/huggingface  modelo Whisper ya descargado
+#   - ~/.cache/hfs          chrome-headless-shell
+#   - ~/.npm                paquete de la CLI de HyperFrames
+#   - assets/normalized.mp4 fuentes ya re-encodeadas con keyframes densos
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Qué ejecutar"
+        type: choice
+        options: [all, transcribe, render]
+        default: all
+        required: false
+      model:
+        description: "Modelo Whisper"
+        type: choice
+        options: [tiny, base, small, medium, large-v3]
+        default: small
+        required: false
+      language:
+        description: "Idioma hablado"
+        default: "es"
+        required: false
+
+concurrency:
+  group: carrito-express
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  PROJECT: carrito-express
+  WHISPER_MODEL: ${{ github.event.inputs.model || 'small' }}
+  LANG: ${{ github.event.inputs.language || 'es' }}
+  MODE: ${{ github.event.inputs.mode || 'all' }}
+  HYPERFRAMES_VERSION: "0.8.161"
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # 1) Transcripción en la nube (faster-whisper, word-level)
+  # ─────────────────────────────────────────────────────────────
+  transcribe:
+    if: ${{ (github.event.inputs.mode || 'all') != 'render' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip (wheels)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-fasterwhisper-1.0.3-av-12.3.0
+
+      - name: Cache Whisper model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-fasterwhisper-${{ github.event.inputs.model || 'small' }}
+
+      - name: Install faster-whisper
+        run: pip install --no-input "faster-whisper==1.0.3" "av==12.3.0"
+
+      - name: Transcribe (word-level)
+        run: |
+          python transcribe.py \
+            --input "$PROJECT/assets/source.mp4" \
+            --model "$WHISPER_MODEL" \
+            --language "$LANG" \
+            --output-dir "$PROJECT/captions"
+
+      # Convención del repo (AGENTS.md): transcript.json = array plano de palabras.
+      - name: Emit transcript.json (flat word array)
+        run: |
+          python - "$PROJECT" <<'PY'
+          import json, sys
+          from pathlib import Path
+          proj = Path(sys.argv[1])
+          src = next(proj.glob("captions/*.words.json"))
+          data = json.loads(src.read_text(encoding="utf-8"))
+          flat = [{"text": w["word"], "start": w["start"], "end": w["end"]}
+                  for w in data.get("words", [])]
+          out = proj / "transcript.json"
+          out.write_text(json.dumps(flat, ensure_ascii=False, indent=1), encoding="utf-8")
+          print(f"{out}: {len(flat)} words, last end={flat[-1]['end'] if flat else 0}")
+          PY
+
+      - name: Upload transcript artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrito-express-transcript
+          path: |
+            carrito-express/transcript.json
+            carrito-express/captions/*.srt
+            carrito-express/captions/*.words.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit transcript back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$PROJECT/transcript.json" "$PROJECT/captions/"
+          git diff --cached --quiet || {
+            git commit -m "chore(carrito-express): cloud transcript ($WHISPER_MODEL/$LANG)"
+            git push
+          }
+
+  # ─────────────────────────────────────────────────────────────
+  # 2) Render en la nube (headless Chrome + ffmpeg)
+  # ─────────────────────────────────────────────────────────────
+  render:
+    if: ${{ (github.event.inputs.mode || 'all') != 'transcribe' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: carrito-express
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache npm (HyperFrames CLI)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-hyperframes-${{ env.HYPERFRAMES_VERSION }}
+
+      - name: Cache chrome-headless-shell
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/hfs
+          key: hfs-${{ runner.os }}-chrome-headless-shell-stable
+
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Install chrome-headless-shell
+        run: |
+          BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell 2>/dev/null | head -n 1)
+          if [ -z "$BIN" ]; then
+            npx --yes @puppeteer/browsers install chrome-headless-shell@stable --path "$HOME/.cache/hfs"
+            BIN=$(find "$HOME/.cache/hfs" -type f -name chrome-headless-shell | head -n 1)
+          fi
+          echo "Using browser: $BIN"
+          echo "HYPERFRAMES_BROWSER_PATH=$BIN" >> "$GITHUB_ENV"
+
+      # El material de WhatsApp viene con keyframes muy separados y el renderer
+      # congela el frame en cada seek. Re-encodeamos con GOP denso (1 keyframe
+      # por frame de composición) y CRF 15 para que la generación extra sea
+      # invisible. El resultado se cachea: si el source no cambia, no se repite.
+      - name: Cache dense-keyframe source
+        id: srccache
+        uses: actions/cache@v4
+        with:
+          path: carrito-express/assets/normalized.mp4
+          key: src-${{ runner.os }}-${{ hashFiles('carrito-express/assets/source.mp4') }}
+
+      - name: Probe source
+        run: |
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,avg_frame_rate,nb_frames,duration \
+            -of default=noprint_wrappers=1 assets/source.mp4
+
+      - name: Re-encode source with dense keyframes
+        if: ${{ steps.srccache.outputs.cache-hit != 'true' }}
+        run: |
+          ffmpeg -y -v error \
+            -i assets/source.mp4 \
+            -vf "fps=30" \
+            -c:v libx264 -r 30 -g 30 -keyint_min 30 \
+            -crf 15 -preset medium -pix_fmt yuv420p \
+            -movflags +faststart \
+            -c:a aac -b:a 192k \
+            assets/normalized.mp4
+          ls -la assets/
+
+      - name: Verify normalized asset
+        run: ffprobe -v error -select_streams v:0 -show_entries stream=nb_frames,avg_frame_rate -of default=noprint_wrappers=1 assets/normalized.mp4
+
+      # Lint estático (rápido): caza errores de composición sin arrancar Chrome.
+      # Se ejecuta en la nube, nunca en local, y bloquea si algo está mal.
+      - name: Lint composition
+        run: npx --yes hyperframes@${{ env.HYPERFRAMES_VERSION }} lint --verbose
+
+      - name: Render MP4
+        run: |
+          npx --yes hyperframes@${{ env.HYPERFRAMES_VERSION }} render \
+            --fps 30 \
+            --quality looks \
+            --browser-timeout 300 \
+            -o renders/carrito-express.mp4
+
+      - name: Upload rendered video
+        uses: actions/upload-artifact@v4
+        with:
+          name: carrito-express-mp4
+          path: carrito-express/renders/carrito-express.mp4
+          if-no-files-found: error
+          retention-days: 14

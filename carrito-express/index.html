@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Carrito Express — Motion Graphics (After Effects style)</title>
+    <style>
+      @font-face {
+        font-family: "Anton";
+        src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("assets/fonts/inter-latin-700-normal.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("assets/fonts/inter-latin-900-normal.woff2") format("woff2");
+        font-weight: 900;
+        font-style: normal;
+        font-display: block;
+      }
+
+      :root {
+        --fire: #e8412a;
+        --fire-deep: #b4240f;
+        --amber: #ffc531;
+        --cream: #fff6e6;
+        --ink: #0a0603;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ink);
+        font-family: "Inter", sans-serif;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      /* ---------- Layer 0 · source footage (untouched, gentle push + drift) ---------- */
+      .stage {
+        position: absolute;
+        inset: 0;
+        will-change: transform;
+      }
+
+      #hero {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* ---------- Layer 1 · grade + scrims (readability for the graphics) ---------- */
+      .grade {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(125% 78% at 50% 44%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.5) 100%),
+          linear-gradient(180deg, rgba(10, 6, 3, 0.62) 0%, rgba(10, 6, 3, 0) 30%);
+      }
+
+      .scrim-b {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 640px;
+        background: linear-gradient(0deg, rgba(10, 6, 3, 0.82) 0%, rgba(10, 6, 3, 0) 100%);
+      }
+
+      /* ---------- Layer 2 · HUD chrome (AE-style corner brackets) ---------- */
+      .corner {
+        position: absolute;
+        width: 96px;
+        height: 96px;
+        border-color: rgba(255, 197, 49, 0.72);
+        border-style: solid;
+        border-width: 0;
+      }
+      .corner.tl {
+        top: 40px;
+        left: 40px;
+        border-top-width: 4px;
+        border-left-width: 4px;
+        border-top-left-radius: 18px;
+      }
+      .corner.tr {
+        top: 40px;
+        right: 40px;
+        border-top-width: 4px;
+        border-right-width: 4px;
+        border-top-right-radius: 18px;
+      }
+      .corner.bl {
+        bottom: 40px;
+        left: 40px;
+        border-bottom-width: 4px;
+        border-left-width: 4px;
+        border-bottom-left-radius: 18px;
+      }
+      .corner.br {
+        bottom: 40px;
+        right: 40px;
+        border-bottom-width: 4px;
+        border-right-width: 4px;
+        border-bottom-right-radius: 18px;
+      }
+
+      /* ---------- Layer 3 · light sweep (beat transition accent) ---------- */
+      .sweep {
+        position: absolute;
+        top: -240px;
+        left: -760px;
+        width: 520px;
+        height: 2400px;
+        transform: rotate(16deg) skewX(-14deg);
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 197, 49, 0.16) 34%,
+          rgba(255, 255, 255, 0.5) 50%,
+          rgba(255, 197, 49, 0.16) 66%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* ---------- Layer 4 · floating particles ---------- */
+      .spark {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 18px rgba(255, 197, 49, 0.8);
+        opacity: 0;
+      }
+
+      /* ---------- Layer 5 · brand lockup ---------- */
+      .brand {
+        position: absolute;
+        top: 86px;
+        left: 76px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 34px 20px 22px;
+        background: rgba(12, 7, 4, 0.6);
+        border: 1px solid rgba(255, 197, 49, 0.42);
+        border-radius: 28px;
+        backdrop-filter: blur(10px);
+        box-shadow:
+          0 26px 60px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.09);
+        overflow: hidden;
+      }
+
+      .brand-sheen {
+        position: absolute;
+        top: -60px;
+        left: -220px;
+        width: 220px;
+        height: 300px;
+        transform: rotate(18deg);
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.42) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+      }
+
+      .dot {
+        display: block;
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: linear-gradient(140deg, var(--amber), var(--fire));
+        box-shadow: 0 0 30px rgba(255, 197, 49, 0.55);
+        flex: none;
+      }
+
+      .txt {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .name {
+        font-family: "Anton", sans-serif;
+        font-size: 46px;
+        line-height: 1;
+        letter-spacing: 1px;
+        color: var(--cream);
+        text-transform: uppercase;
+      }
+
+      .handle {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 2.4px;
+        color: var(--amber);
+        margin-top: 10px;
+        text-transform: uppercase;
+      }
+
+      /* ---------- Layer 6 · chapter HUD (top-right) ---------- */
+      .chapter {
+        position: absolute;
+        top: 92px;
+        right: 76px;
+        width: 396px;
+        height: 132px;
+      }
+
+      .chip {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 396px;
+        height: 132px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 18px;
+        padding: 0 26px 0 24px;
+        background: rgba(12, 7, 4, 0.62);
+        border: 1px solid rgba(232, 65, 42, 0.5);
+        border-radius: 22px;
+        backdrop-filter: blur(10px);
+        box-shadow:
+          0 22px 50px rgba(0, 0, 0, 0.48),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      .chip-num {
+        font-family: "Anton", sans-serif;
+        font-size: 56px;
+        line-height: 1;
+        color: var(--fire);
+        text-shadow: 0 0 24px rgba(232, 65, 42, 0.55);
+      }
+
+      .chip-rule {
+        width: 5px;
+        height: 62px;
+        border-radius: 3px;
+        background: linear-gradient(180deg, var(--amber), var(--fire));
+        flex: none;
+      }
+
+      .chip-body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+      }
+
+      .chip-label {
+        font-family: "Anton", sans-serif;
+        font-size: 34px;
+        line-height: 1.05;
+        letter-spacing: 0.5px;
+        color: var(--cream);
+        text-transform: uppercase;
+      }
+
+      .chip-tag {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 17px;
+        letter-spacing: 3px;
+        color: var(--amber);
+        margin-top: 8px;
+        text-transform: uppercase;
+      }
+
+      /* ---------- Layer 7 · bottom CTA ---------- */
+      .cta {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 128px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .pill {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 24px 48px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--fire), var(--fire-deep));
+        box-shadow:
+          0 26px 60px rgba(232, 65, 42, 0.52),
+          inset 0 1px 0 rgba(255, 255, 255, 0.26);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .pill-sheen {
+        position: absolute;
+        top: -50px;
+        left: -160px;
+        width: 150px;
+        height: 220px;
+        transform: rotate(18deg);
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.45) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        opacity: 0;
+      }
+
+      .wa {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: #25d366;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        box-shadow: 0 0 26px rgba(37, 211, 102, 0.55);
+      }
+
+      .wa svg {
+        display: block;
+      }
+
+      .pill-body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pill-k {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        letter-spacing: 2.2px;
+        color: var(--amber);
+        text-transform: uppercase;
+      }
+
+      .pill-v {
+        font-family: "Anton", sans-serif;
+        font-size: 46px;
+        line-height: 1.05;
+        letter-spacing: 1.5px;
+        color: var(--cream);
+      }
+
+      .cta-sub {
+        font-family: "Inter", sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 3.6px;
+        color: rgba(255, 246, 230, 0.82);
+        text-transform: uppercase;
+      }
+
+      /* ---------- Layer 8 · progress rail ---------- */
+      .progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 9px;
+        background: rgba(255, 246, 230, 0.14);
+      }
+
+      .progress .bar {
+        display: block;
+        width: 100%;
+        height: 100%;
+        transform-origin: left center;
+        background: linear-gradient(90deg, var(--amber), var(--fire));
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1080"
+      data-height="1920"
+      data-duration="18.5"
+    >
+      <!-- Source footage: untouched, only reframed by the non-timed .stage wrapper -->
+      <div class="stage">
+        <video
+          id="hero"
+          src="assets/normalized.mp4"
+          playsinline
+          data-has-audio="true"
+          data-start="0"
+          data-duration="18.5"
+          data-track-index="0"
+          data-volume="1"
+        ></video>
+      </div>
+
+      <div class="grade"></div>
+      <div class="scrim-b"></div>
+
+      <div class="sweep" id="sweep"></div>
+
+      <div id="sparks" class="clip" data-start="0" data-duration="18.5">
+        <span class="spark" style="top: 430px; left: 140px"></span>
+        <span class="spark" style="top: 690px; left: 900px"></span>
+        <span class="spark" style="top: 980px; left: 250px"></span>
+        <span class="spark" style="top: 1560px; left: 880px"></span>
+        <span class="spark" style="top: 1720px; left: 200px"></span>
+        <span class="spark" style="top: 1210px; left: 620px"></span>
+      </div>
+
+      <div id="hud" class="clip" data-start="0" data-duration="18.5">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+      </div>
+
+      <div id="brand" class="clip" data-start="0.35" data-duration="18.15">
+        <span class="brand">
+          <span class="brand-sheen"></span>
+          <span class="dot"></span>
+          <span class="txt">
+            <span class="name">Tu Marca</span>
+            <span class="handle">@tumarca · carrito gastronómico</span>
+          </span>
+        </span>
+      </div>
+
+      <div id="chapter" class="clip" data-start="0" data-duration="18.5">
+        <span class="chapter">
+          <span class="chip">
+            <span class="chip-num">01</span>
+            <span class="chip-rule"></span>
+            <span class="chip-body">
+              <span class="chip-label">Entrega express</span>
+              <span class="chip-tag">A domicilio</span>
+            </span>
+          </span>
+          <span class="chip">
+            <span class="chip-num">02</span>
+            <span class="chip-rule"></span>
+            <span class="chip-body">
+              <span class="chip-label">Listo para<br />trabajar</span>
+              <span class="chip-tag">Armado final</span>
+            </span>
+          </span>
+          <span class="chip">
+            <span class="chip-num">03</span>
+            <span class="chip-rule"></span>
+            <span class="chip-body">
+              <span class="chip-label">Cobro en mano</span>
+              <span class="chip-tag">Cliente feliz</span>
+            </span>
+          </span>
+          <span class="chip">
+            <span class="chip-num">04</span>
+            <span class="chip-rule"></span>
+            <span class="chip-body">
+              <span class="chip-label">Hecho a medida</span>
+              <span class="chip-tag">Cotiza el tuyo</span>
+            </span>
+          </span>
+        </span>
+      </div>
+
+      <div id="cta" class="clip" data-start="11.4" data-duration="7.1">
+        <span class="cta">
+          <span class="pill">
+            <span class="pill-sheen"></span>
+            <span class="wa">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="#0a0603">
+                <path
+                  d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.54.05-1.05.24-3.53-.73-2.98-1.17-4.85-4.25-5-4.45-.14-.2-1.17-1.56-1.17-2.97 0-1.41.73-2.1 1-2.39.26-.29.58-.36.77-.36l.55.01c.18.01.42-.07.65.5.24.58.82 2 .89 2.14.07.15.12.32.02.51-.09.2-.14.32-.29.49l-.43.5c-.14.14-.29.3-.12.59.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.33 1.44.29.15.46.12.63-.07.17-.2.73-.85.92-1.15.2-.29.39-.24.65-.15.26.1 1.68.79 1.97.94.29.14.48.22.55.34.07.12.07.7-.17 1.38Z"
+                />
+              </svg>
+            </span>
+            <span class="pill-body">
+              <span class="pill-k">Cotiza por WhatsApp</span>
+              <span class="pill-v">981 121 0541</span>
+            </span>
+          </span>
+          <span class="cta-sub">Entrega express · Hecho a medida</span>
+        </span>
+      </div>
+
+      <div class="progress"><span class="bar"></span></div>
+    </div>
+
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const DUR = 18.5;
+
+      // ── Beat grid: chapter chip windows (seconds) ──
+      // Retime these to the transcript's real sentence boundaries.
+      const BEATS = [
+        { in: 0.55, out: 4.5 },
+        { in: 4.5, out: 9.0 },
+        { in: 9.0, out: 13.2 },
+        { in: 13.2, out: DUR - 0.35 },
+      ];
+
+      const tl = gsap.timeline({ paused: true });
+
+      // ── Reframe: slow continuous push + drift across the whole clip ──
+      tl.fromTo(
+        ".stage",
+        { scale: 1.03, xPercent: 0, yPercent: 0 },
+        { scale: 1.1, xPercent: -1.6, yPercent: -1.2, duration: DUR, ease: "sine.inOut" },
+        0,
+      );
+
+      // ── Corner brackets draw in ──
+      tl.fromTo(
+        ".corner",
+        { scale: 0.55, autoAlpha: 0 },
+        { scale: 1, autoAlpha: 1, duration: 0.75, ease: "expo.out", stagger: 0.06 },
+        0.15,
+      );
+      // HUD breathes gently for the rest of the clip
+      tl.to(
+        ".corner",
+        { autoAlpha: 0.72, duration: 1.6, repeat: 5, yoyo: true, ease: "sine.inOut" },
+        2.2,
+      );
+
+      // ── Brand lockup: blur-in + slide, then a light sheen ──
+      tl.fromTo(
+        ".brand",
+        { x: -70, autoAlpha: 0, filter: "blur(14px)" },
+        { x: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.85, ease: "expo.out" },
+        0.35,
+      );
+      tl.fromTo(
+        ".brand-sheen",
+        { x: 0, opacity: 0 },
+        { x: 340, opacity: 1, duration: 0.7, ease: "power2.inOut" },
+        0.85,
+      );
+      tl.to(".brand-sheen", { opacity: 0, duration: 0.2 }, 1.5);
+
+      // Brand dot heartbeat
+      tl.to(".dot", { scale: 1.14, duration: 1.15, repeat: 5, yoyo: true, ease: "sine.inOut" }, 2.0);
+
+      // ── Chapter chips: roll in / out per beat, with a light sweep on entry ──
+      const chips = gsap.utils.toArray("#chapter .chip");
+      BEATS.forEach(function (b, i) {
+        const chip = chips[i];
+        if (!chip) return;
+        const num = chip.querySelector(".chip-num");
+        const rule = chip.querySelector(".chip-rule");
+        const label = chip.querySelector(".chip-label");
+        const tag = chip.querySelector(".chip-tag");
+
+        // entry
+        tl.set(chip, { autoAlpha: 1 }, b.in);
+        tl.fromTo(
+          chip,
+          { x: 60, autoAlpha: 0 },
+          { x: 0, autoAlpha: 1, duration: 0.5, ease: "expo.out" },
+          b.in,
+        );
+        tl.fromTo(rule, { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power3.out" }, b.in + 0.1);
+        tl.fromTo(
+          num,
+          { autoAlpha: 0, y: -26, scale: 0.7 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.8)" },
+          b.in + 0.06,
+        );
+        tl.fromTo(
+          label,
+          { autoAlpha: 0, x: 30 },
+          { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" },
+          b.in + 0.16,
+        );
+        tl.fromTo(
+          tag,
+          { autoAlpha: 0, x: 30 },
+          { autoAlpha: 1, x: 0, duration: 0.45, ease: "power3.out" },
+          b.in + 0.24,
+        );
+
+        // exit (skip on the last chip — it holds to the end)
+        if (i < BEATS.length - 1) {
+          tl.to(chip, { autoAlpha: 0, x: -34, duration: 0.3, ease: "power2.in" }, b.out - 0.3);
+          tl.set(chip, { autoAlpha: 0 }, b.out);
+        }
+
+        // light sweep accent on every beat after the first
+        if (i > 0) {
+          tl.fromTo("#sweep", { x: 0, opacity: 0 }, { x: 2400, opacity: 1, duration: 0.62, ease: "power2.inOut" }, b.in - 0.14);
+          tl.to("#sweep", { opacity: 0, duration: 0.18 }, b.in + 0.48);
+        }
+      });
+
+      // ── Floating sparks ──
+      gsap.utils.toArray("#sparks .spark").forEach(function (s, i) {
+        const t = 0.8 + i * 1.7;
+        tl.fromTo(
+          s,
+          { autoAlpha: 0, y: 40, scale: 0.4 },
+          { autoAlpha: 0.85, y: 0, scale: 1, duration: 1.1, ease: "power2.out" },
+          t,
+        );
+        if (t + 1.6 < DUR) {
+          tl.to(s, { autoAlpha: 0, y: -60, duration: 1.4, ease: "power2.in" }, t + 1.6);
+        }
+      });
+
+      // ── Bottom CTA: pop in with sheen, then a heartbeat ──
+      tl.fromTo(
+        ".pill",
+        { y: 70, scale: 0.92, autoAlpha: 0 },
+        { y: 0, scale: 1, autoAlpha: 1, duration: 0.85, ease: "expo.out" },
+        11.4,
+      );
+      tl.fromTo(
+        ".pill-sheen",
+        { x: 0, opacity: 0 },
+        { x: 460, opacity: 1, duration: 0.75, ease: "power2.inOut" },
+        11.9,
+      );
+      tl.to(".pill-sheen", { opacity: 0, duration: 0.2 }, 12.65);
+      tl.fromTo(
+        ".cta-sub",
+        { autoAlpha: 0, y: 26 },
+        { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" },
+        12.0,
+      );
+      tl.to(".pill", { scale: 1.035, duration: 0.9, repeat: 3, yoyo: true, ease: "sine.inOut" }, 13.2);
+
+      // ── End flourish: rule expands + CTA lifts ──
+      tl.to(".pill", { y: -14, duration: 0.7, ease: "power2.out" }, DUR - 0.9);
+
+      // ── Progress rail ──
+      tl.fromTo(".bar", { scaleX: 0 }, { scaleX: 1, duration: DUR, ease: "none" }, 0);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
